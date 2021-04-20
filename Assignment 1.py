@@ -4,6 +4,14 @@ class IncorrectConfigHeader(Exception):
     """Raised when the leftmost word of a line in the config file is not a recognised header"""
     pass
 
+class RouterIDError(Exception):
+    """Raised when the router id is not an integer or is out of the range 1 -> 64000"""
+    pass
+
+class PortDupeError(Exception):
+    """Raised when the config file contains a duplicate port number"""
+    pass
+
 prog_name = sys.argv[0]
 print()
 
@@ -30,27 +38,53 @@ except:
 
 print(config_lines)
 
-router_id = 0
-in_ports = []
-out_ports = []
+router_id = -1
+input_ports = []
+output_ports = []
 timer = 180
 
 try:
     for line in config_lines:
-        if line[0] == 'router-id':
-            pass
-        elif line[0] == 'input-port':
-            pass
-        elif line[0] == 'output-port':
-            pass
-        elif line[0] == int(line[0]) and int(line[0]) in range():
-            pass
+        print("LINE IS:", line)
+        first = line[0]
+        if first == 'router-id':
+            print('1\n')
+            
+            if router_id == -1 and line[1] in range(1, 64001):
+                router_id = line[0]
+                print("Router ID assigned correctly\n")
+            else:
+                raise RouterIDError
+            
+        elif first == 'input-ports':
+            print('2\n')
+            if line[1] in input_ports or line[1] in output_ports:
+                raise PortError
+            
+            elif type(line[1]) == type(0) and line[1] in range(1024, 64001):
+                pass
+            
+        elif first == 'output-ports':
+            print('3\n')
+            
+        elif first == 'timer':
+            #if line[1] == int(line[0]) and int(line[0]) in range()
+            timer = line[1]
+            print('4\n')
+            
         else:
             raise IncorrectConfigHeader
+        
 except IncorrectConfigHeader:
-    pass
+    print("One of the headers in the config file cannot be processed. Make sure that the header is one of the following:\nrouter-id, input-port, output-port, timer\n")
+    sys.exit()
+    
+except RouterIDError:
+    print("\n")
+    sys.exit()
+    
 except:
-    print("Unknown error occured while processing config file. Please double check that values used are correct\n")
+    print("Unknown error occured while processing config file. Please double check that each header is followed by a \n")
     sys.exit()
 
 #for index in range(len(in_ports)):
