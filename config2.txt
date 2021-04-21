@@ -1,2 +1,4 @@
 router-id 2
-input-ports 6110 6201 7345
+input-ports 12158 177324
+output-ports 6553-1-1 62363-3-3
+timer xxxxxxx
