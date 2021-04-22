@@ -1,23 +1,6 @@
 import sys, socket, select
 
-#Custom errors for use with try/except
-class IncorrectConfigHeader(Exception):
-    """Raised when the leftmost word of a line in the config file is not a recognised header"""
-    pass
-
-class RouterIDError(Exception):
-    """Raised when the router id is not an integer or is out of the range 1 -> 64000"""
-    pass
-
-class PortDupeError(Exception):
-    """Raised when the config file contains a duplicate port number"""
-    pass
-
-class EmptyConfigError(Exception):
-    """Raised when a line of the config file has a header but no value"""
-    pass
-
-print() #To aid with readability of the text output in terminal
+print()   #To aid with readability of the text output in terminal
 
 if len(sys.argv) > 1:   #If there is a command line argument
     config_filename = str(sys.argv[1])  #Save the name of the config file for this router to a variable
@@ -35,69 +18,105 @@ except:
 
 try:
     for index in range(len(config_lines)):
-        config_lines[index] = [x.strip('\n') for x in config_lines[index].split(' ')]   #Split each line into strings and strip any newline characters
+        config_lines[index] = [x.strip("\n") for x in config_lines[index].split(" ")]   #Split each line into strings and strip any newline characters
 except:
     print("Incorrect line format on line {} of config file.\n".format(index))
     sys.exit()  #Exit the program with an error message if there is a line in the config file that cannot be split into strings
 
-router_id = -1      #Set the router id to -1 initially so that it is possible to check if the router id has already been assigned to a correct value (between 1 and 64000)
+router_id = None
 input_ports = []    #Create an empty list to hold the input ports of this router
 output_ports = []   #Create an empty list to hold the output ports of this router
-timer = 1010         #Set the default timer interval to _____ ~~~~~(find a good default value later)~~~~~
+timer = 1010        #Set the default timer interval to _____ ~~~~~(find a good default value later)~~~~~
 
 try:
     for line in config_lines:
         if len(line) < 2:
             raise EmptyConfigError
         
-        print("~~~~~~~~~ LINE IS:", line, "~~~~~~~~~")
         first_str = line[0]
         
         #If the line being read is assigning the router ID
-        if first_str == 'router-id':
+        if first_str == "router-id":
             
-            if router_id == -1 and int(line[1]) in range(1, 64001):
-                router_id = line[1]
-                print("Router ID assigned to {}\n".format(router_id))
+            if router_id == None:
+                if line[1].isnumeric() == False:
+                    print("Router ID must be an integer.\n")
+                    sys.exit()
+                if int(line[1]) in range(1, 64001):
+                    router_id = line[1]
+                    print("Router ID assigned to {}\n".format(router_id))
+                else:
+                    print("Router ID must be between 1 and 64000.")
+                    sys.exit()
             else:
-                raise RouterIDError
+                print("Router ID must only be assigned once.\n")
+                sys.exit()
             
         #If the line being read is assigning the input ports
-        elif first_str == 'input-ports':
+        elif first_str == "input-ports":
             for index in range(1, len(line)):
-                if line[index] in input_ports or line[index] in output_ports:
-                    raise PortError
+                if line[index].isnumeric() == False:
+                    print("ERROR: Input ports must be positive integers.\n")
+                    sys.exit()
+                elif int(line[index]) in input_ports:
+                    print("ERROR: Duplicate input port number detected.\n")
+                    sys.exit()
+                elif int(line[index]) in [x[0] for x in output_ports]:
+                    print("ERROR: An input port is already assigned as an output port.\n")
+                    sys.exit()
+                elif int(line[index]) not in range(1024, 64001):
+                    print("ERROR: All input ports in the config file must be between 1024 and 64000\n")
+                    sys.exit()
+                else:
+                    input_ports.append(int(line[index]))
+            print("Input ports assigned to {}\n".format([x for x in input_ports]))
             
-                elif line[index].isnumeric() and int(line[index]) in range(1024, 64001):
-                    input_ports.append(line[index])
-            
-            print('Input ports assigned to {}\n'.format([x for x in input_ports]))
-        
         #If the line being read is assigning the output ports
-        elif first_str == 'output-ports':
+        elif first_str == "output-ports":
             for index in range(1, len(line)):
-                output_port = [x.strip('\n') for x in line[index].split('-')]
-                print("-=-=-=-=-=-=-=- Port is:", output_port, "-=-=-=-=-=-=-=-")
-            print('Output ports assigned to {}\n'.format([x for x in output_ports]))
-        
+                output_port = [int(x.strip("\n")) for x in line[index].split("-")]
+                output_ports.append(output_port)
+            print("Output ports assigned to {}".format([x[0] for x in output_ports]))
+            print("Output metrics assigned to {}".format([x[1] for x in output_ports]))
+            print("Output router IDs assigned to {}\n".format([x[2] for x in output_ports]))
+            
+            
+            
+            
+            
+            #IMPLEMENT CHECK FOR DUPLICATE PORTS
+            
+            
+            
+            
+            
         #If the line being read is assigning the timer interval
-        elif first_str == 'timer':
-            timer = line[1]
-            print('TIMER IS: {}\n'.format(timer))    #FOR DEBUGGING
+        elif first_str == "timer":
+            if line[1].isnumeric() == False:
+                print("ERROR: Timer value is not an integer.\n")
+                sys.exit()
+            else:
+                timer = line[1]
+            print("Timer interval is assigned to {} ms\n".format(timer))
             
         else:
-            raise IncorrectConfigHeader
-        
-except IncorrectConfigHeader:
-    print("One of the headers in the config file cannot be processed. Make sure that the header is one of the following:\nrouter-id, input-ports, output-ports, timer\n")
-    sys.exit()
-    
-except RouterIDError:
-    print("\n")
-    sys.exit()
-    
+            print("ERROR: One of the headers in the config file cannot be processed. Make sure that the header is one of the following:\nrouter-id, input-ports, output-ports, timer\n")
+            sys.exit()
+
 except:
-    print("Unknown error occured while processing config file. Please double check that each header is followed by a \n")
+    print("Program ran into an error.\n")
+    sys.exit()
+
+error_msg = ""
+if router_id == None:
+    error_msg += "ERROR: Router ID was not assigned in config file.\n"
+elif input_ports == list():
+    error_msg += "ERROR: Input ports not assigned in config file.\n"
+elif output_ports == list():
+    error_msg += "ERROR: Output ports not assigned in config file.\n"
+
+if error_msg != "":
+    print(error_msg)
     sys.exit()
 
 #for index in range(len(in_ports)):
