@@ -116,22 +116,24 @@ try:
                 timeout = int(line[1])
                 periodic_timer = int(timeout/6)
             print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(timeout, periodic_timer))
-
+    
+    error_msg = ""
+    if router_id == None:
+        error_msg += "ERROR: Router ID was not assigned in config file.\n"
+    if input_ports == list():
+        error_msg += "ERROR: Input ports not assigned in config file.\n"
+    if output_ports == list():
+        error_msg += "ERROR: Output ports not assigned in config file.\n"
+    
+    if error_msg != "":
+        print(error_msg)
+        sys.exit()
+    
 except:
     print("Program ran into an error.\n")
     sys.exit()
 
-error_msg = ""
-if router_id == None:
-    error_msg += "ERROR: Router ID was not assigned in config file.\n"
-elif input_ports == list():
-    error_msg += "ERROR: Input ports not assigned in config file.\n"
-elif output_ports == list():
-    error_msg += "ERROR: Output ports not assigned in config file.\n"
 
-if error_msg != "":
-    print(error_msg)
-    sys.exit()
 
 #for index in range(len(in_ports)):
     #port = in_ports[index]
