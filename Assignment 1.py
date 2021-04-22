@@ -74,8 +74,10 @@ try:
             for index in range(1, len(line)):
                 #output_port = [int(x.strip("\n")) for x in line[index].split("-")]
                 output = line[index].split("-")
-                
-                if output[0].isnumeric() == False:
+                if len(output) != 3:
+                    print("ERROR: The length of an output port definition is of incorrent length. Make sure output ports are of the form PORT-METRIC-ROUTER ID.\n")
+                    sys.exit()                    
+                elif output[0].isnumeric() == False or output[1].isnumeric() == False or output[2].isnumeric() == False:
                     print("ERROR: Output ports, metrics and router IDs must be positive integers.\n")
                     sys.exit()
                 elif int(output[0]) in input_ports:
@@ -86,6 +88,15 @@ try:
                     sys.exit()                        
                 elif int(output[0]) not in range(1024, 64001):
                     print("ERROR: All output ports in the config file must be between 1024 and 64000\n")
+                    sys.exit()
+                elif int(output[2]) == router_id:
+                    print("ERROR: The router ID of one of the output ports matches the router ID of this router.\n")
+                    sys.exit()
+                elif int(output[1]) not in range(0, 17):
+                    print("ERROR: The metric of one of the output ports is not between 0 and 16.\n")
+                    sys.exit()
+                elif int(output[2]) not in range(1, 64001):
+                    print("ERROR: The router ID of one of the output ports is not between 1 and 64000.\n")
                     sys.exit()
                 else:
                     output_ports.append([int(x) for x in output])
