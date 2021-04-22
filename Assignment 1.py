@@ -30,8 +30,6 @@ timer = 1010        #Set the default timer interval to _____ ~~~~~(find a good d
 
 try:
     for line in config_lines:
-        if len(line) < 2:
-            raise EmptyConfigError
         
         first_str = line[0]
         
@@ -74,21 +72,26 @@ try:
         #If the line being read is assigning the output ports
         elif first_str == "output-ports":
             for index in range(1, len(line)):
-                output_port = [int(x.strip("\n")) for x in line[index].split("-")]
-                output_ports.append(output_port)
+                #output_port = [int(x.strip("\n")) for x in line[index].split("-")]
+                output = line[index].split("-")
+                
+                if output[0].isnumeric() == False:
+                    print("ERROR: Output ports, metrics and router IDs must be positive integers.\n")
+                    sys.exit()
+                elif int(output[0]) in input_ports:
+                    print("ERROR: An output port is already assigned as an input port.\n")
+                    sys.exit()
+                elif int(output[0]) in [x[0] for x in output_ports]:
+                    print("ERROR: Duplicate output port number detected.\n")
+                    sys.exit()                        
+                elif int(output[0]) not in range(1024, 64001):
+                    print("ERROR: All output ports in the config file must be between 1024 and 64000\n")
+                    sys.exit()
+                else:
+                    output_ports.append([int(x) for x in output])
             print("Output ports assigned to {}".format([x[0] for x in output_ports]))
             print("Output metrics assigned to {}".format([x[1] for x in output_ports]))
             print("Output router IDs assigned to {}\n".format([x[2] for x in output_ports]))
-            
-            
-            
-            
-            
-            #IMPLEMENT CHECK FOR DUPLICATE PORTS
-            
-            
-            
-            
             
         #If the line being read is assigning the timer interval
         elif first_str == "timer":
@@ -98,10 +101,6 @@ try:
             else:
                 timer = line[1]
             print("Timer interval is assigned to {} ms\n".format(timer))
-            
-        else:
-            print("ERROR: One of the headers in the config file cannot be processed. Make sure that the header is one of the following:\nrouter-id, input-ports, output-ports, timer\n")
-            sys.exit()
 
 except:
     print("Program ran into an error.\n")

@@ -1,4 +1,4 @@
 router-id 6
 input-ports 2018 4493
 output-ports 8256-5-1 61752-1-5
-timer xxxxxxx
+timer 1000
