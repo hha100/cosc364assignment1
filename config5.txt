@@ -1,4 +1,4 @@
 router-id 5
 input-ports 8873 61752
 output-ports 58199-2-4 4493-1-6
-timer 1000
+timeout 180

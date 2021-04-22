@@ -26,7 +26,7 @@ except:
 router_id = None
 input_ports = []    #Create an empty list to hold the input ports of this router
 output_ports = []   #Create an empty list to hold the output ports of this router
-timer = 1010        #Set the default timer interval to _____ ~~~~~(find a good default value later)~~~~~
+timeout = 180        #Set the default timer interval to _____ ~~~~~(find a good default value later)~~~~~
 
 try:
     for line in config_lines:
@@ -40,12 +40,12 @@ try:
                 if line[1].isnumeric() == False:
                     print("Router ID must be an integer.\n")
                     sys.exit()
-                if int(line[1]) in range(1, 64001):
-                    router_id = line[1]
-                    print("Router ID assigned to {}\n".format(router_id))
-                else:
+                if int(line[1]) not in range(1, 64001):
                     print("Router ID must be between 1 and 64000.")
                     sys.exit()
+                else:
+                    router_id = line[1]
+                    print("Router ID assigned to {}\n".format(router_id))
             else:
                 print("Router ID must only be assigned once.\n")
                 sys.exit()
@@ -104,14 +104,18 @@ try:
             print("Output metrics assigned to {}".format([x[1] for x in output_ports]))
             print("Output router IDs assigned to {}\n".format([x[2] for x in output_ports]))
             
-        #If the line being read is assigning the timer interval
-        elif first_str == "timer":
+        #If the line being read is assigning the timeout interval
+        elif first_str == "timeout":
             if line[1].isnumeric() == False:
-                print("ERROR: Timer value is not an integer.\n")
+                print("ERROR: Timeout value is not an integer.\n")
+                sys.exit()
+            elif int(line[1]) not in range(10, 181):
+                print("ERROR: Timeout interval must be an integer between 10 and 180 seconds.\n")
                 sys.exit()
             else:
-                timer = line[1]
-            print("Timer interval is assigned to {} ms\n".format(timer))
+                timeout = int(line[1])
+                periodic_timer = int(timeout/6)
+            print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(timeout, periodic_timer))
 
 except:
     print("Program ran into an error.\n")
