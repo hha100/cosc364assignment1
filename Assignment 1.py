@@ -92,9 +92,6 @@ try:
                 elif int(output[2]) == router_id:
                     print("ERROR: The router ID of one of the output ports matches the router ID of this router.\n")
                     sys.exit()
-                elif int(output[1]) not in range(0, 17):
-                    print("ERROR: The metric of one of the output ports is not between 0 and 16.\n")
-                    sys.exit()
                 elif int(output[2]) not in range(1, 64001):
                     print("ERROR: The router ID of one of the output ports is not between 1 and 64000.\n")
                     sys.exit()
