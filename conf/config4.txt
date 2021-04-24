@@ -1,0 +1,4 @@
+router-id 4
+input-ports 31781 44438 58199
+output-ports 52137-4-3 32619-6-7 8873-2-5
+timeout 180

@@ -35,3 +35,6 @@ class RoutingTable:
 
     def add_to_table(self, destination, costs, next_hop):
         self.entries.append(RIPEntry(destination, costs, next_hop))
+
+# Now we want to create the initial Routing Table, using the output ports from the config file
+
