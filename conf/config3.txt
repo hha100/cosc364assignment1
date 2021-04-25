@@ -1,0 +1,4 @@
+router-id 3
+input-ports 62363 52137
+output-ports 17324-3-2 31781-4-4
+timeout 180
