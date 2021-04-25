@@ -45,4 +45,4 @@ class RoutingTable:
 
 def init_table():
     for index in range(len(output_ports)):
-        
+        pass
