@@ -131,16 +131,14 @@ except:
     sys.exit()
 
 
-
-#for index in range(len(in_ports)):
-    #port = in_ports[index]
+input_sockets = []
+for index in range(len(input_ports)):
+    port = input_ports[index]
     
-    #daemon = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #daemon.bind(('localhost', portnum))
-    #daemon.listen(1)
-
-
-#print("\nIncorrect header detected on line {} of config file.\n".format(Exception))
+    daemon = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    daemon.bind(('localhost', port))
+    daemon.listen(5)    
+    input_sockets.append(daemon)
 
 #while True:
     ##use select() to block until events occur
