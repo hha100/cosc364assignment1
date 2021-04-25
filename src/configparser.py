@@ -1,7 +1,6 @@
-import sys, socket, select
+import sys
 
-
-def parse(conf_file):
+def parse(config_filename):
     print()  # To aid with readability of the text output in terminal
 
     try:
@@ -14,8 +13,7 @@ def parse(conf_file):
 
     try:
         for index in range(len(config_lines)):
-            config_lines[index] = [x.strip("\n") for x in config_lines[index].split(
-                " ")]  # Split each line into strings and strip any newline characters
+            config_lines[index] = [x.strip("\n") for x in config_lines[index].split(" ")]  # Split each line into strings and strip any newline characters
     except:
         print("Incorrect line format on line {} of config file.\n".format(index))
         sys.exit()  # Exit the program with an error message if there is a line in the config file that cannot be split into strings
@@ -23,8 +21,8 @@ def parse(conf_file):
     router_id = None
     input_ports = []  # Create an empty list to hold the input ports of this router
     output_ports = []  # Create an empty list to hold the output ports of this router
-    timeout = 180  # Set the default timer interval to _____ ~~~~~(find a good default value later)~~~~~
-
+    timeout = 180  # Set the default timer interval to 180
+    
     try:
         for line in config_lines:
 
@@ -69,14 +67,12 @@ def parse(conf_file):
             # If the line being read is assigning the output ports
             elif first_str == "output-ports":
                 for index in range(1, len(line)):
-                    # output_port = [int(x.strip("\n")) for x in line[index].split("-")]
                     output = line[index].split("-")
                     if len(output) != 3:
                         print(
                             "ERROR: The length of an output port definition is of incorrent length. Make sure output ports are of the form PORT-METRIC-ROUTER ID.\n")
                         sys.exit()
-                    elif output[0].isnumeric() == False or output[1].isnumeric() == False or output[
-                        2].isnumeric() == False:
+                    elif output[0].isnumeric() == False or output[1].isnumeric() == False or output[2].isnumeric() == False:
                         print("ERROR: Output ports, metrics and router IDs must be positive integers.\n")
                         sys.exit()
                     elif int(output[0]) in input_ports:
@@ -111,8 +107,7 @@ def parse(conf_file):
                 else:
                     timeout = int(line[1])
                     periodic_timer = int(timeout / 6)
-                print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(timeout,
-                                                                                                                periodic_timer))
+                print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(timeout, periodic_timer))
 
         error_msg = ""
         if router_id == None:
@@ -127,18 +122,5 @@ def parse(conf_file):
             sys.exit()
 
     except:
-        print("Program ran into an error.\n")
+        print("Program ran into an error while reading the configuration file.\n")
         sys.exit()
-
-    # for index in range(len(in_ports)):
-    # port = in_ports[index]
-
-    # daemon = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # daemon.bind(('localhost', portnum))
-    # daemon.listen(1)
-
-    # print("\nIncorrect header detected on line {} of config file.\n".format(Exception))
-
-    # while True:
-    ##use select() to block until events occur
-    # pass

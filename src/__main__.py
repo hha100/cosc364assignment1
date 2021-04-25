@@ -2,9 +2,7 @@
 which file you want to run
 e.g. 'py src conf/config1.txt' """
 
-import routingtable
-import configparser
-import sys
+import routingtable, configparser, sys
 
 if len(sys.argv) > 1:  # If there is a command line argument
     """config_filename = str(sys.argv[1])  # Save the name of the config file for this router to a variable"""
@@ -14,3 +12,4 @@ else:
     sys.exit()  # Exit the program with an error message if there is no command line argument
 
 configparser.parse(config_filename)
+initialiserouters.init()

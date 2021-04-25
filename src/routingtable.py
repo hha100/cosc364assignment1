@@ -22,7 +22,9 @@ class RIPEntry:
     def __str__(self):
         return 'RIP Entry: \n Destination: {0} \n Costs: {1} \n Next Hop: {2} \n Route Change Flag: {3}'.format(
             self.destination, self.costs, self.next_hop, self.flag)
-
+    
+    def get_info():
+        return [self.destination, self.costs, self.next_hop, self.flag]
 
 class RoutingTable:
     """
@@ -35,6 +37,12 @@ class RoutingTable:
 
     def add_to_table(self, destination, costs, next_hop):
         self.entries.append(RIPEntry(destination, costs, next_hop))
+        
+    def get_table():
+        return self.entries
 
 # Now we want to create the initial Routing Table, using the output ports from the config file
 
+def init_table():
+    for index in range(len(output_ports)):
+        
