@@ -21,7 +21,7 @@ def parse(config_filename):
     router_id = None
     input_ports = []  # Create an empty list to hold the input ports of this router
     output_ports = []  # Create an empty list to hold the output ports of this router
-    timeout = 180  # Set the default timer interval to 180
+    timeouts = [180, 30]  # Set the default timer interval to 180
     
     try:
         for line in config_lines:
@@ -69,8 +69,7 @@ def parse(config_filename):
                 for index in range(1, len(line)):
                     output = line[index].split("-")
                     if len(output) != 3:
-                        print(
-                            "ERROR: The length of an output port definition is of incorrent length. Make sure output ports are of the form PORT-METRIC-ROUTER ID.\n")
+                        print("ERROR: The length of an output port definition is of incorrent length. Make sure output ports are of the form PORT-METRIC-ROUTER ID.\n")
                         sys.exit()
                     elif output[0].isnumeric() == False or output[1].isnumeric() == False or output[2].isnumeric() == False:
                         print("ERROR: Output ports, metrics and router IDs must be positive integers.\n")
@@ -105,9 +104,9 @@ def parse(config_filename):
                     print("ERROR: Timeout interval must be an integer between 10 and 180 seconds.\n")
                     sys.exit()
                 else:
-                    timeout = int(line[1])
-                    periodic_timer = int(timeout / 6)
-                print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(timeout, periodic_timer))
+                    timeouts[0] = int(line[1])
+                    timeouts[1] = int(timeouts[0] / 6)
+                print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(timeouts[0], timeouts[1]))
 
         error_msg = ""
         if router_id == None:
@@ -124,3 +123,5 @@ def parse(config_filename):
     except:
         print("Program ran into an error while reading the configuration file.\n")
         sys.exit()
+    
+    return config_filename, router_id, input_ports, output_ports, timeouts

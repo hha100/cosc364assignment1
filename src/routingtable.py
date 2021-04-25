@@ -43,6 +43,8 @@ class RoutingTable:
 
 # Now we want to create the initial Routing Table, using the output ports from the config file
 
-def init_table():
+def init_table(config_filename, output_ports):
+    rip_table = RoutingTable(config_filename)
     for index in range(len(output_ports)):
         pass
+    return rip_table
