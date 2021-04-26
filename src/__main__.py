@@ -23,16 +23,22 @@ def main():
     print()
     print("Routing table object, plus filename and entries are:\n{}\n{}\n{}".format(rip_table, rip_table.entries, rip_table.config_file))   # for debugging
 
+    #print()
+    #print("Routing table object, plus filename and entries are:\n{}\n{}\n{}".format(rip_table, rip_table.entries, rip_table.config_file))   # for debugging
 
-    # Do the main loop of the routing daemon here after config file parsed, routers initialised, and initial routing table populated.
-    """
-    try:
-        while True:
-            #use select() to block until events occur
-            break
-    except:
-        print("Program ran into an error while routing.\n")
-        sys.exit()
-    """
+    print("\nInitial routing table entries are as follows:\n")
+
+    for entry in rip_table.get_table():
+        print(entry)
+        # Do the main loop of the routing daemon here after config file parsed, routers initialised, and initial routing table populated.
+        """
+        try:
+            while True:
+                #use select() to block until events occur
+                break
+        except:
+            print("Program ran into an error while routing.\n")
+            sys.exit()
+        """
 if __name__ == "__main__":
     main()
