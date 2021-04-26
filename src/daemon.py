@@ -20,6 +20,7 @@ def init(input_ports):
 
     return input_sockets
 
+
 def compare_tables(rip_table, incoming_table):
     """
     Compares any two routing tables, and updates any relevant entries in table 1
@@ -40,11 +41,7 @@ def compare_tables(rip_table, incoming_table):
                     # ToDo: When sending out a table, add your own came_from to all entries (set your own router ID to it)
                     # ToDo: Make sure data is valid
                     # Here is the actual comparison code
-                    if (total_incoming_cost < rip_costs) or ((
-                                                                     inc_came_from == rip_came_from) and (
-                                                                     (total_incoming_cost != rip_costs) or (
-                                                                     inc_flag != rip_flag) or (
-                                                                             inc_next_hop != rip_next_hop))):
+                    if (total_incoming_cost < rip_costs) or ((inc_came_from == rip_came_from) and ((total_incoming_cost != rip_costs) or (inc_flag != rip_flag) or (inc_next_hop != rip_next_hop))):
                         incoming_table_entry.costs = total_incoming_cost
                         rip_table.update_entry(rip_table_entry, incoming_table_entry)
 
@@ -61,19 +58,20 @@ def send_table(rip_table):
     # Create packet with table to send
     # Send packet to each neighbour
 
+
 # Infinite Loop
 
 def start_loop(config_filename):
     print("initializing...")
     config_filename, router_id, input_ports, output_ports, timeouts = configparser.parse(config_filename)
     rip_table = routingtable.init_table(config_filename, output_ports)
-    # input_sockets = daemon.init(input_ports)
     input_sockets = init(input_ports)
 
     try:
         while True:
             # use select() to block until events occur
             print("while loop")
+            # Check our neighbour routers and make sure we can still access them all
             # Send out the current table
             send_table(rip_table)
             # If a table is received from another router....
@@ -83,8 +81,16 @@ def start_loop(config_filename):
             # If input_sockets is not empty, run the select() function to listen to all sockets at the same time
             if input_sockets:
                 print("input_sockets is:\n{}".format(input_sockets))
+                # ToDo: remove the number 5 and have a variable in its place
                 readable, writable, exceptional = select.select(input_sockets, [], input_sockets, 5)
-                print("Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable, writable, exceptional))
+                print(
+                    "Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable, writable,
+                                                                                                    exceptional))
+
+            for socket in exceptional:
+                print("Select() exceptional error\nsocket: {}".format(socket))
+
+            # Look into python's socket import receive and send functions
 
     except:
         print("An error occurred (exception in daemon start_loop)")

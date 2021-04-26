@@ -2,7 +2,7 @@
 which file you want to run
 e.g. 'py src conf/config1.txt' """
 
-import routingtable, configparser, daemon, sys
+import daemon, sys
 
 
 # def send_table(rip_table):
