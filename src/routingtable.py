@@ -55,12 +55,11 @@ class RoutingTable:
     def update_entry(self, current_entry, replacement_entry):
         # ToDo: Add checks to make sure the data is valid. Maybe separate it out into a single validator function?
         destination, costs, next_hop, flag, came_from = replacement_entry.get_info()
-        self.entries(current_entry).costs = costs
-        self.entries(current_entry).came_from = came_from
-        self.entries(current_entry).next_hop = next_hop
-        self.entries(current_entry).flag = flag
-        print("Entry updated. Entry was: {0} \n Entry is now {1}".format(current_entry, self.entries(current_entry)))
-
+        self.entries[current_entry].costs = costs
+        self.entries[current_entry].came_from = came_from
+        self.entries[current_entry].next_hop = next_hop
+        self.entries[current_entry].flag = flag
+        print("Entry updated. Entry was: {0} \n Entry is now {1}".format(current_entry, self.entries[current_entry]))
 
     def remove_entry(self, destination):
         for entry in self.entries:
