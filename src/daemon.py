@@ -56,6 +56,8 @@ def compare_tables(rip_table, incoming_table):
 # Infinite Loop
 
 def start_loop(input_ports):
+    print("initializing...")
+    input_sockets = init(input_ports)
     try:
         while True:
             # use select() to block until events occur
@@ -65,13 +67,13 @@ def start_loop(input_ports):
             # If a table is received from another router....
             # compare_tables(rip_table, incoming_table)
             # break
-            print("initializing...")
-            input_sockets = init(input_ports)
+
+            # If input_sockets is not empty, run the select() function to listen to all sockets at the same time
             if input_sockets:
                 print("input_sockets is:\n{}".format(input_sockets))
-            readable, writable, exceptional = select.select([], [], input_ports)
-            print("Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable, writable, exceptional))
+                readable, writable, exceptional = select.select(input_sockets, [], input_sockets, 5)
+                print("Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable, writable, exceptional))
 
     except:
-        print("Program ran into an error while routing.\n")
+        print("An error occurred (exception in daemon start_loop)")
         sys.exit()

@@ -21,7 +21,7 @@ class RIPEntry:
 
     # Dunder method, setting the string to be printed when an instance of the object is called
     def __str__(self):
-        return 'RIP Entry: \n    Destination: {0} \n    Cost: {1} \n    Next Hop: {2} \n    Route Change Flag: {3} \n Came From Router: {4}'.format(
+        return 'RIP Entry: \n    Destination: {0} \n    Cost: {1} \n    Next Hop: {2} \n    Route Change Flag: {3} \n   Came From Router: {4}'.format(
             self.destination, self.costs, self.next_hop, self.flag, self.came_from)
 
     def get_info(self):

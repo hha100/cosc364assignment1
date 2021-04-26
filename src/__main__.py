@@ -2,7 +2,7 @@
 which file you want to run
 e.g. 'py src conf/config1.txt' """
 
-import routingtable, configparser, initialiserouters, sys
+import routingtable, configparser, daemon, sys
 
 
 # def send_table(rip_table):
@@ -50,7 +50,7 @@ def main():
 
     config_filename = str(sys.argv[1])
     config_filename, router_id, input_ports, output_ports, timeouts = configparser.parse(config_filename)
-    input_sockets = daemon.init(input_ports)
+    # input_sockets = daemon.init(input_ports)
     rip_table = routingtable.init_table(config_filename, output_ports)
 
     print()
@@ -70,11 +70,11 @@ def main():
 
             # If a table is received from another router....
             #
-            compare_tables(rip_table, incoming_table)
-            break
-    except:
-        print("Program ran into an error while routing.\n")
-        sys.exit()
+    # compare_tables(rip_table, incoming_table)
+    # break
+    # except:
+    #     print("Program ran into an error while routing.\n")
+    #     sys.exit()
 
 
 if __name__ == "__main__":
