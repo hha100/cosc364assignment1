@@ -1,2 +1,0 @@
-router-id 15286
-input-ports 6110 6201 7345
