@@ -113,6 +113,7 @@ def parse(config_filename):
                 print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(
                     timeouts[0], timeouts[1]))
 
+
         error_msg = ""
         if router_id == None:
             error_msg += "ERROR: Router ID was not assigned in config file.\n"
