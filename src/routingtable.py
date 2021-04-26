@@ -20,10 +20,9 @@ class RIPEntry:
 
     # Dunder method, setting the string to be printed when an instance of the object is called
     def __str__(self):
-        return 'RIP Entry: \n Destination: {0} \n Costs: {1} \n Next Hop: {2} \n Route Change Flag: {3}'.format(
-            self.destination, self.costs, self.next_hop, self.flag)
+        return 'RIP Entry: \n    Destination: {0} \n    Cost: {1} \n    Next Hop: {2} \n    Route Change Flag: {3}'.format(self.destination, self.costs, self.next_hop, self.flag)
     
-    def get_info():
+    def get_info(self):
         return [self.destination, self.costs, self.next_hop, self.flag]
 
 class RoutingTable:
@@ -35,10 +34,10 @@ class RoutingTable:
         self.config_file = config_file
         self.entries = []
 
-    def add_to_table(self, destination, costs, next_hop):
-        self.entries.append(RIPEntry(destination, costs, next_hop))
+    def add_to_table(self, entry):
+        self.entries.append(entry)
         
-    def get_table():
+    def get_table(self):
         return self.entries
 
 # Now we want to create the initial Routing Table, using the output ports from the config file
@@ -46,5 +45,7 @@ class RoutingTable:
 def init_table(config_filename, output_ports):
     rip_table = RoutingTable(config_filename)
     for index in range(len(output_ports)):
-        pass
+        port = output_ports[index]
+        entry = RIPEntry(port[2], port[1], port[2])
+        rip_table.add_to_table(entry)
     return rip_table

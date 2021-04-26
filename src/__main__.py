@@ -14,9 +14,12 @@ config_filename, router_id, input_ports, output_ports, timeouts = configparser.p
 input_sockets = initialiserouters.init(input_ports)
 rip_table = routingtable.init_table(config_filename, output_ports)
 
-print()
-print("Routing table object, plus filename and entries are:\n{}\n{}\n{}".format(rip_table, rip_table.entries, rip_table.config_file))   # for debugging
+#print()
+#print("Routing table object, plus filename and entries are:\n{}\n{}\n{}".format(rip_table, rip_table.entries, rip_table.config_file))   # for debugging
 
+print("\nInitial routing table entries are as follows:\n")
+for entry in rip_table.get_table():
+    print(entry)
 
 # Do the main loop of the routing daemon here after config file parsed, routers initialised, and initial routing table populated.
 """

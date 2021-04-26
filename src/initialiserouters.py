@@ -1,4 +1,4 @@
-import sys, socket, select
+import sys, socket
 
 def init(input_ports):
     # Set up a UDP socket for each input ports (none needed for output ports)
