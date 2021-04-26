@@ -43,11 +43,59 @@ class RoutingTable:
     def get_table(self):
         return self.entries
 
-    def force_update(self, entry):
-        # destination, costs, next_hop, flag, came_from = entry.get_info()
-        # self.entries.remove()
+"""
+    def update2_entry(self, entry):
+        destination, costs, next_hop, flag, came_from = entry.get_info()
+        self.entries.remove_entry(destination)
+        self.add_to_table(entry)
+        print("Added entry {}".format(entry))
+"""
 
-    # def update_entry(self, entry):
+    def update_entry(self, current_entry, replacement_entry):
+        # ToDo: Add checks to make sure the data is valid. Maybe separate it out into a single validator function?
+        destination, costs, next_hop, flag, came_from = replacement_entry.get_info()
+        self.entries(current_entry).costs = costs
+        self.entries(current_entry).came_from = came_from
+        self.entries(current_entry).next_hop = next_hop
+        self.entries(current_entry).flag = flag
+        print("Entry updated. Entry is was: {0} \n Entry is now {1}".format(current_entry, self.entries(current_entry)))
+
+
+    def remove_entry(self, destination):
+        for entry in self.entries:
+            if entry.destination == destination:
+                self.entries.remove(entry)
+                print("Removed entry {}".format(entry))
+                break
+
+    def compare_tables(self, incoming_table):
+        for incoming_table_entry in incoming_table.get_table():
+            destination, costs, next_hop, flag, came_from = incoming_table_entry.get_info()
+            if destination not in self.entries:
+                self.add_to_table(incoming_table_entry)
+                print("Added new destination to table. Check back here cause i gotta rethink this code")
+            else:
+                for current_table_entry in self.entries():
+                    if incoming_table_entry.destination == current_table_entry.destination:
+                        cost_to_connection = 1  # Assume the metric/cost to a connected router or network is 1
+                        # Maybe an if to check if incoming is to the directly connected network? And pass it on? or would that logic be somewhere else like in main
+                        total_incoming_cost = costs + cost_to_connection
+                        # ToDo: When sending out a table, add your own came_from to all entries (set your own router ID to it)
+                        # ToDo: Make sure data is valid
+                        if (total_incoming_cost < current_table_entry.costs) or (came_from == current_table_entry.came_from) or (flag != self.flag):
+                            if (total_incoming_cost != current_table_entry.costs) or (flag != self.flag):
+                                incoming_table_entry.costs = total_incoming_cost
+                                self.update_entry(current_table_entry, incoming_table_entry)
+
+        print("Routing Table comparison complete.")
+
+        # print("{0} \n {1} \n {2} \n {3} \n {4}".format(destination, costs, next_hop, flag, came_from))  # For debugging
+
+
+
+
+# #
+
         """
         # ToDo: Make sure type is RIPEntry else exception error
         # Check destination of incoming entry and find out if already in current table
@@ -64,6 +112,7 @@ class RoutingTable:
         # Add entry to table if no current entry for that router
         # Compare metric/costs (after adding cost from receiving router) to current costs & update if lower (always update if from same router original entry came from)
         """
+
 
 # Now we want to create the initial Routing Table, using the output ports from the config file
 

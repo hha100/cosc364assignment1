@@ -12,23 +12,7 @@ def compare(incoming_table):
     """
     Compares an incoming table with the current routing table, and updates any entries that should be updated
     """
-    """
-    for tableEntry in incoming_table.get_table():
-        # Double for loop? For each entry in the table compare to each entry in our table?
-        if tableEntry.destination == destination:
-            cost_to_connection = 1  # Assume the metric/cost to a connected router is 1
-            total_incoming_cost = costs + cost_to_connection
-            # ToDo: When sending out a table, add your own came_from to all entries (set your own router ID to it)
-            if (costs < total_incoming_cost) or (came_from == tableEntry.came_from):
-                tableEntry.forceUpdate(entry)
-    # Add entry to table if no current entry for that router
-    # Compare metric/costs (after adding cost from receiving router) to current costs & update if lower (always update if from same router original entry came from)
-
-
-    # Check destination of incoming entry and find out if already in current table
-    destination, costs, next_hop, flag, came_from = entry.get_info()
-    print("{0} \n {1} \n {2} \n {3} \n {4}".format(destination, costs, next_hop, flag, came_from))  # For debugging
-"""
+    
 
 
 def main():
