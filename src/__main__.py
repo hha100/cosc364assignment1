@@ -4,6 +4,32 @@ e.g. 'py src conf/config1.txt' """
 
 import routingtable, configparser, initialiserouters, sys
 
+def send_table(rip_table):
+
+
+
+def compare(incoming_table):
+    """
+    Compares an incoming table with the current routing table, and updates any entries that should be updated
+    """
+    """
+    for tableEntry in incoming_table.get_table():
+        # Double for loop? For each entry in the table compare to each entry in our table?
+        if tableEntry.destination == destination:
+            cost_to_connection = 1  # Assume the metric/cost to a connected router is 1
+            total_incoming_cost = costs + cost_to_connection
+            # ToDo: When sending out a table, add your own came_from to all entries (set your own router ID to it)
+            if (costs < total_incoming_cost) or (came_from == tableEntry.came_from):
+                tableEntry.forceUpdate(entry)
+    # Add entry to table if no current entry for that router
+    # Compare metric/costs (after adding cost from receiving router) to current costs & update if lower (always update if from same router original entry came from)
+
+
+    # Check destination of incoming entry and find out if already in current table
+    destination, costs, next_hop, flag, came_from = entry.get_info()
+    print("{0} \n {1} \n {2} \n {3} \n {4}".format(destination, costs, next_hop, flag, came_from))  # For debugging
+"""
+
 
 def main():
     """
@@ -21,24 +47,31 @@ def main():
     rip_table = routingtable.init_table(config_filename, output_ports)
 
     print()
-    print("Routing table object, plus filename and entries are:\n{}\n{}\n{}".format(rip_table, rip_table.entries, rip_table.config_file))   # for debugging
 
-    #print()
-    #print("Routing table object, plus filename and entries are:\n{}\n{}\n{}".format(rip_table, rip_table.entries, rip_table.config_file))   # for debugging
+    # print() print("Routing table object, plus filename and entries are:\n{}\n{}\n{}".format(rip_table, rip_table.config_file, rip_table.entries))   # for debugging
 
     print("\nInitial routing table entries are as follows:\n")
 
+    i = 1
     for entry in rip_table.get_table():
+        print(i)
         print(entry)
-        # Do the main loop of the routing daemon here after config file parsed, routers initialised, and initial routing table populated.
-        """
-        try:
-            while True:
-                #use select() to block until events occur
-                break
-        except:
-            print("Program ran into an error while routing.\n")
-            sys.exit()
-        """
+        i += 1
+
+    # Do the main loop of the routing daemon here after config file parsed, routers initialised, and initial routing table populated.
+    try:
+        while True:
+            # use select() to block until events occur
+            print("while loop")
+            #Send out the current table
+            send_table(rip_table)
+            # If a table is received from another router....
+            # compare(incoming_table)
+            break
+    except:
+        print("Program ran into an error while routing.\n")
+        sys.exit()
+
+
 if __name__ == "__main__":
     main()

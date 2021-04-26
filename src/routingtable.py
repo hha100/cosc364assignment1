@@ -7,7 +7,7 @@ class RIPEntry:
     -IPv4 address of next router along path to destination (AKA "next hop"). Not needed if destination is on one of the directly connected networks
     -Flag to indicate that info about the route has changed recently. (AKA "route change flag")
     -Various timers associated with route (?)
-    -Subnet mask (?)
+    -Subnet mask if all extensions are implemented. We are not implementing any extensions, therefore subnet mask is not needed
     -WIP: We need garbage collection
     """
 
@@ -17,13 +17,16 @@ class RIPEntry:
         self.costs = costs
         self.next_hop = next_hop
         self.flag = 0
+        self.came_from = None
 
     # Dunder method, setting the string to be printed when an instance of the object is called
     def __str__(self):
-        return 'RIP Entry: \n    Destination: {0} \n    Cost: {1} \n    Next Hop: {2} \n    Route Change Flag: {3}'.format(self.destination, self.costs, self.next_hop, self.flag)
-    
+        return 'RIP Entry: \n    Destination: {0} \n    Cost: {1} \n    Next Hop: {2} \n    Route Change Flag: {3} \n Came From Router: {4}'.format(
+            self.destination, self.costs, self.next_hop, self.flag, self.came_from)
+
     def get_info(self):
-        return [self.destination, self.costs, self.next_hop, self.flag]
+        return self.destination, self.costs, self.next_hop, self.flag, self.came_from
+
 
 class RoutingTable:
     """
@@ -36,9 +39,31 @@ class RoutingTable:
 
     def add_to_table(self, entry):
         self.entries.append(entry)
-        
+
     def get_table(self):
         return self.entries
+
+    def force_update(self, entry):
+        # destination, costs, next_hop, flag, came_from = entry.get_info()
+        # self.entries.remove()
+
+    # def update_entry(self, entry):
+        """
+        # ToDo: Make sure type is RIPEntry else exception error
+        # Check destination of incoming entry and find out if already in current table
+        destination, costs, next_hop, flag, came_from = entry.get_info()
+        print("{0} \n {1} \n {2} \n {3} \n {4}".format(destination, costs, next_hop, flag, came_from))  # For debugging
+
+        for tableEntry in self.get_table():
+            if tableEntry.destination == destination:
+                cost_to_connection = 1  # Assume the metric/cost to a connected router is 1
+                total_incoming_cost = costs + cost_to_connection
+                # ToDo: When sending out a table, add your own came_from to all entries (set your own router ID to it)
+                if (costs < total_incoming_cost) or (came_from == tableEntry.came_from):
+                    tableEntry.forceUpdate(entry)
+        # Add entry to table if no current entry for that router
+        # Compare metric/costs (after adding cost from receiving router) to current costs & update if lower (always update if from same router original entry came from)
+        """
 
 # Now we want to create the initial Routing Table, using the output ports from the config file
 
