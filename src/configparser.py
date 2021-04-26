@@ -1,5 +1,6 @@
 import sys
 
+
 def parse(config_filename):
     print()  # To aid with readability of the text output in terminal
 
@@ -13,7 +14,8 @@ def parse(config_filename):
 
     try:
         for index in range(len(config_lines)):
-            config_lines[index] = [x.strip("\n") for x in config_lines[index].split(" ")]  # Split each line into strings and strip any newline characters
+            config_lines[index] = [x.strip("\n") for x in config_lines[index].split(
+                " ")]  # Split each line into strings and strip any newline characters
     except:
         print("Incorrect line format on line {} of config file.\n".format(index))
         sys.exit()  # Exit the program with an error message if there is a line in the config file that cannot be split into strings
@@ -22,7 +24,7 @@ def parse(config_filename):
     input_ports = []  # Create an empty list to hold the input ports of this router
     output_ports = []  # Create an empty list to hold the output ports of this router
     timeouts = [180, 30]  # Set the default timer interval to 180
-    
+
     try:
         for line in config_lines:
 
@@ -41,7 +43,6 @@ def parse(config_filename):
                     else:
                         router_id = line[1]
                         print("Router ID assigned to {}\n".format(router_id))
-                        config["router_id"] = router_id
                 else:
                     print("Router ID must only be assigned once.\n")
                     sys.exit()
@@ -64,16 +65,17 @@ def parse(config_filename):
                     else:
                         input_ports.append(int(line[index]))
                 print("Input ports assigned to {}\n".format([x for x in input_ports]))
-                config["input_ports"] = input_ports
 
             # If the line being read is assigning the output ports
             elif first_str == "output-ports":
                 for index in range(1, len(line)):
                     output = line[index].split("-")
                     if len(output) != 3:
-                        print("ERROR: The length of an output port definition is of incorrent length. Make sure output ports are of the form PORT-METRIC-ROUTER ID.\n")
+                        print(
+                            "ERROR: The length of an output port definition is of incorrent length. Make sure output ports are of the form PORT-METRIC-ROUTER ID.\n")
                         sys.exit()
-                    elif output[0].isnumeric() == False or output[1].isnumeric() == False or output[2].isnumeric() == False:
+                    elif output[0].isnumeric() == False or output[1].isnumeric() == False or output[
+                        2].isnumeric() == False:
                         print("ERROR: Output ports, metrics and router IDs must be positive integers.\n")
                         sys.exit()
                     elif int(output[0]) in input_ports:
@@ -94,12 +96,8 @@ def parse(config_filename):
                     else:
                         output_ports.append([int(x) for x in output])
                 print("Output ports assigned to {}".format([x[0] for x in output_ports]))
-                config["output_ports"] = [x[0] for x in output_ports]
                 print("Output metrics assigned to {}".format([x[1] for x in output_ports]))
-                config["output_metrics"] = [x[1] for x in output_ports]
                 print("Output router IDs assigned to {}\n".format([x[2] for x in output_ports]))
-                config["output_router_ids"] = [x[2] for x in output_ports]
-
 
             # If the line being read is assigning the timeout interval
             elif first_str == "timeout":
@@ -112,7 +110,8 @@ def parse(config_filename):
                 else:
                     timeouts[0] = int(line[1])
                     timeouts[1] = int(timeouts[0] / 6)
-                print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(timeouts[0], timeouts[1]))
+                print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(
+                    timeouts[0], timeouts[1]))
 
         error_msg = ""
         if router_id == None:
@@ -130,5 +129,5 @@ def parse(config_filename):
     except:
         print("Program ran into an error while reading the configuration file.\n")
         sys.exit()
-    
+
     return config_filename, router_id, input_ports, output_ports, timeouts

@@ -4,16 +4,18 @@ e.g. 'py src conf/config1.txt' """
 
 import routingtable, configparser, initialiserouters, sys
 
-if len(sys.argv) > 1:  # If there is a command line argument
-    config_filename = str(sys.argv[1])
-else:
-    print("\nConfig filename not detected. Please use a command line argument of the form 'router1_config.txt'.\n")
-    sys.exit()  # Exit the program with an error message if there is no command line argument
 
 def main():
     """
     Main code to be run
     """
+    if len(sys.argv) > 1:  # If there is a command line argument
+        config_filename = str(sys.argv[1])
+    else:
+        print("\nConfig filename not detected. Please use a command line argument of the form 'router1_config.txt'.\n")
+        sys.exit()  # Exit the program with an error message if there is no command line argument
+
+    config_filename = str(sys.argv[1])
     config_filename, router_id, input_ports, output_ports, timeouts = configparser.parse(config_filename)
     input_sockets = initialiserouters.init(input_ports)
     rip_table = routingtable.init_table(config_filename, output_ports)
