@@ -1,4 +1,4 @@
-import sys, socket, select
+import sys, socket, routingtable, configparser, select
 
 
 def init(input_ports):
@@ -20,10 +20,10 @@ def init(input_ports):
 
     return input_sockets
 
-
 def compare_tables(rip_table, incoming_table):
     """
     Compares any two routing tables, and updates any relevant entries in table 1
+    Returns the updated RIP Table
     """
     for incoming_table_entry in incoming_table.get_table():
         inc_destination, inc_costs, inc_next_hop, inc_flag, inc_came_from = incoming_table_entry.get_info()
@@ -49,23 +49,35 @@ def compare_tables(rip_table, incoming_table):
                         rip_table.update_entry(rip_table_entry, incoming_table_entry)
 
     print("Routing Table comparison complete.")
+    return rip_table
 
     # print("{0} \n {1} \n {2} \n {3} \n {4}".format(destination, costs, next_hop, flag, came_from))  # For debugging
 
 
+def send_table(rip_table):
+    print("Attempting to send my table to all neighbours...")
+    print("...But there's no sending logic yet")
+    # Get list of neighbours
+    # Create packet with table to send
+    # Send packet to each neighbour
+
 # Infinite Loop
 
-def start_loop(input_ports):
+def start_loop(config_filename):
     print("initializing...")
+    config_filename, router_id, input_ports, output_ports, timeouts = configparser.parse(config_filename)
+    rip_table = routingtable.init_table(config_filename, output_ports)
+    # input_sockets = daemon.init(input_ports)
     input_sockets = init(input_ports)
+
     try:
         while True:
             # use select() to block until events occur
             print("while loop")
             # Send out the current table
-            # send_table(rip_table)
+            send_table(rip_table)
             # If a table is received from another router....
-            # compare_tables(rip_table, incoming_table)
+            # rip_table = compare_tables(rip_table, incoming_table)
             # break
 
             # If input_sockets is not empty, run the select() function to listen to all sockets at the same time
