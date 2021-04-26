@@ -50,7 +50,7 @@ def main():
 
     config_filename = str(sys.argv[1])
     config_filename, router_id, input_ports, output_ports, timeouts = configparser.parse(config_filename)
-    input_sockets = initialiserouters.init(input_ports)
+    input_sockets = daemon.init(input_ports)
     rip_table = routingtable.init_table(config_filename, output_ports)
 
     print()
@@ -66,12 +66,7 @@ def main():
         i += 1
 
     # Do the main loop of the routing daemon here after config file parsed, routers initialised, and initial routing table populated.
-    try:
-        while True:
-            # use select() to block until events occur
-            print("while loop")
-            # Send out the current table
-            send_table(rip_table)
+    daemon.start_loop(input_ports)
 
             # If a table is received from another router....
             #
