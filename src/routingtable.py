@@ -27,6 +27,15 @@ class RIPEntry:
     def get_info(self):
         return self.destination, self.costs, self.next_hop, self.flag, self.came_from
 
+    def get_destination(self):
+        return self.destination()
+
+    def get_costs(self):
+        return self.costs
+
+    def get_came_from(self):
+        return self.came_from
+
 
 class RoutingTable:
     """
@@ -43,6 +52,7 @@ class RoutingTable:
     def get_table(self):
         return self.entries
 
+
 """
     def update2_entry(self, entry):
         destination, costs, next_hop, flag, came_from = entry.get_info()
@@ -58,7 +68,7 @@ class RoutingTable:
         self.entries(current_entry).came_from = came_from
         self.entries(current_entry).next_hop = next_hop
         self.entries(current_entry).flag = flag
-        print("Entry updated. Entry is was: {0} \n Entry is now {1}".format(current_entry, self.entries(current_entry)))
+        print("Entry updated. Entry was: {0} \n Entry is now {1}".format(current_entry, self.entries(current_entry)))
 
 
     def remove_entry(self, destination):
@@ -67,29 +77,6 @@ class RoutingTable:
                 self.entries.remove(entry)
                 print("Removed entry {}".format(entry))
                 break
-
-    def compare_tables(self, incoming_table):
-        for incoming_table_entry in incoming_table.get_table():
-            destination, costs, next_hop, flag, came_from = incoming_table_entry.get_info()
-            if destination not in self.entries:
-                self.add_to_table(incoming_table_entry)
-                print("Added new destination to table. Check back here cause i gotta rethink this code")
-            else:
-                for current_table_entry in self.entries():
-                    if incoming_table_entry.destination == current_table_entry.destination:
-                        cost_to_connection = 1  # Assume the metric/cost to a connected router or network is 1
-                        # Maybe an if to check if incoming is to the directly connected network? And pass it on? or would that logic be somewhere else like in main
-                        total_incoming_cost = costs + cost_to_connection
-                        # ToDo: When sending out a table, add your own came_from to all entries (set your own router ID to it)
-                        # ToDo: Make sure data is valid
-                        if (total_incoming_cost < current_table_entry.costs) or (came_from == current_table_entry.came_from) or (flag != self.flag):
-                            if (total_incoming_cost != current_table_entry.costs) or (flag != self.flag):
-                                incoming_table_entry.costs = total_incoming_cost
-                                self.update_entry(current_table_entry, incoming_table_entry)
-
-        print("Routing Table comparison complete.")
-
-        # print("{0} \n {1} \n {2} \n {3} \n {4}".format(destination, costs, next_hop, flag, came_from))  # For debugging
 
 
 
