@@ -5,5 +5,5 @@ Authors: Henry Hay-Smith, Ryan Akers
 Date: 20/04/2021
 Description: Python code to create a RIP Routing Daemon
 
-Usage: `py src conf/config1.txt` (replace `conf/config1.txt` with any valid config file)
-
+Windows Usage: `py src conf/config1.txt` (replace `conf/config1.txt` with any valid config file)
+Linux Usage: `python3 src conf/config1.txt`
