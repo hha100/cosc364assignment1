@@ -7,7 +7,14 @@ import configparser
 import sys
 
 
-print("hi")
+def main():
+    """
+    Main code to be run
+    """
+    config_filename = str(sys.argv[1])
+    config = configparser.parse(config_filename)
+    print("Config: \n {0}".format(config))
 
-config_filename = str(sys.argv[1])
-configparser.parse(config_filename)
+
+if __name__ == "__main__":
+    main()

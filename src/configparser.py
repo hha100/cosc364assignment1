@@ -2,6 +2,7 @@ import sys, socket, select
 
 
 def parse(conf_file):
+    config = {}
     print()  # To aid with readability of the text output in terminal
 
     if len(sys.argv) > 1:  # If there is a command line argument
@@ -50,6 +51,7 @@ def parse(conf_file):
                     else:
                         router_id = line[1]
                         print("Router ID assigned to {}\n".format(router_id))
+                        config["router_id"] = router_id
                 else:
                     print("Router ID must only be assigned once.\n")
                     sys.exit()
@@ -72,6 +74,7 @@ def parse(conf_file):
                     else:
                         input_ports.append(int(line[index]))
                 print("Input ports assigned to {}\n".format([x for x in input_ports]))
+                config["input_ports"] = input_ports
 
             # If the line being read is assigning the output ports
             elif first_str == "output-ports":
@@ -104,8 +107,12 @@ def parse(conf_file):
                     else:
                         output_ports.append([int(x) for x in output])
                 print("Output ports assigned to {}".format([x[0] for x in output_ports]))
+                config["output_ports"] = [x[0] for x in output_ports]
                 print("Output metrics assigned to {}".format([x[1] for x in output_ports]))
+                config["output_metrics"] = [x[1] for x in output_ports]
                 print("Output router IDs assigned to {}\n".format([x[2] for x in output_ports]))
+                config["output_router_ids"] = [x[2] for x in output_ports]
+
 
             # If the line being read is assigning the timeout interval
             elif first_str == "timeout":
@@ -120,6 +127,8 @@ def parse(conf_file):
                     periodic_timer = int(timeout / 6)
                 print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(timeout,
                                                                                                                 periodic_timer))
+                config["timeout"] = timeout
+                config["periodic_timer"] = periodic_timer
 
         error_msg = ""
         if router_id == None:
@@ -133,9 +142,18 @@ def parse(conf_file):
             print(error_msg)
             sys.exit()
 
+
     except:
         print("Program ran into an error.\n")
         sys.exit()
+
+    return config
+    # print("Configs: \n {}".format(config))
+
+
+
+
+
 
     # for index in range(len(in_ports)):
     # port = in_ports[index]
