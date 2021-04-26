@@ -9,7 +9,7 @@ import routingtable, configparser, initialiserouters, sys
 
 def compare_tables(rip_table, incoming_table):
     """
-    Compares an incoming table with the current routing table, and updates any entries that should be updated
+    Compares any two routing tables, and updates any relevant entries in table 1
     """
 
     # ToDo: I think i need to change all these self comparisons to "server" comparisons cause if this is run on the incoming table self. will always be the .. yanow

@@ -52,15 +52,6 @@ class RoutingTable:
     def get_table(self):
         return self.entries
 
-
-"""
-    def update2_entry(self, entry):
-        destination, costs, next_hop, flag, came_from = entry.get_info()
-        self.entries.remove_entry(destination)
-        self.add_to_table(entry)
-        print("Added entry {}".format(entry))
-"""
-
     def update_entry(self, current_entry, replacement_entry):
         # ToDo: Add checks to make sure the data is valid. Maybe separate it out into a single validator function?
         destination, costs, next_hop, flag, came_from = replacement_entry.get_info()
@@ -77,28 +68,6 @@ class RoutingTable:
                 self.entries.remove(entry)
                 print("Removed entry {}".format(entry))
                 break
-
-
-
-
-# #
-
-        """
-        # ToDo: Make sure type is RIPEntry else exception error
-        # Check destination of incoming entry and find out if already in current table
-        destination, costs, next_hop, flag, came_from = entry.get_info()
-        print("{0} \n {1} \n {2} \n {3} \n {4}".format(destination, costs, next_hop, flag, came_from))  # For debugging
-
-        for tableEntry in self.get_table():
-            if tableEntry.destination == destination:
-                cost_to_connection = 1  # Assume the metric/cost to a connected router is 1
-                total_incoming_cost = costs + cost_to_connection
-                # ToDo: When sending out a table, add your own came_from to all entries (set your own router ID to it)
-                if (costs < total_incoming_cost) or (came_from == tableEntry.came_from):
-                    tableEntry.forceUpdate(entry)
-        # Add entry to table if no current entry for that router
-        # Compare metric/costs (after adding cost from receiving router) to current costs & update if lower (always update if from same router original entry came from)
-        """
 
 
 # Now we want to create the initial Routing Table, using the output ports from the config file
