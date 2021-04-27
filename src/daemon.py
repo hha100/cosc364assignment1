@@ -107,7 +107,7 @@ class Daemon:
             # print("----OUTPORT PORT BEING ADDED TO DEST_LIST: {}".format(output_port[0]))
             dest = (ip, output_port[0])
             dest_list.append(dest)
-            
+
         # ToDo: we want dest_list = list of ip addresses and their ports [(ip, port), (ip, port)]
         # print("Made it past 1st for loop, dest_list created")
         # print("dest_list is: {}".format(dest_list))
@@ -196,8 +196,9 @@ class Daemon:
                     #     s.sendto(byte_message, (client_ip_address, port_number))
                     # s.sendto(encoded_message, target_destination)
 
-                    # for s in exceptional:
-                    #    print("Select() exceptional error\nsocket: {}".format(socket))
+                    for s in exceptional:
+                        print("Select() exceptional error. Exceptional: {}\ns: {}".format(exceptional, s))
+
                     print("sleeping...")
                     # To set periodic timer (usually 30secs)
                     # time.sleep(self.timeouts[1])
