@@ -10,7 +10,6 @@ def connect_socket(input_port):
 
 
 def entry_to_string(rip_entry):
-    print("start of inside ets")
     destination, costs, next_hop, flag, came_from = rip_entry.get_info()
     string = "{0}_{1}_{2}_{3}_{4}".format(destination, costs, next_hop, flag, came_from)
     print("entry_to_string is: {}".format(string))
@@ -105,14 +104,15 @@ class Daemon:
         # Get list of neighbours/direct connections
         # Create list of neighbours
         for output_port in self.output_ports:
-            dest = (ip, output_port)
+            print("----OUTPORT PORT BEING ADDED TO DEST_LIST: {}".format(output_port[0]))
+            dest = (ip, output_port[0])
             dest_list.append(dest)
         # ToDo: we want dest_list = list of ip addresses and their ports [(ip, port), (ip, port)]
         print("Made it past 1st for loop")
+        print("dest_list is: {}".format(dest_list))
 
         # Create packet with table to send
         # Turn RIP table into data to send
-        print("self.rip_table is: {0}\nself.rip_table.entries is: {1}".format(self.rip_table, self.rip_table.entries))
         table_data = ''
         # table_data = packet.table_to_packet(self.rip_table)
         table_entries = self.rip_table.entries
@@ -120,19 +120,26 @@ class Daemon:
         packets = []
         for entry in table_entries:
             print(entry)
-            print("just before entry_to_string")
             new_entry = entry_to_string(entry)
-            print("just after entry_to_string")
             packets.append(bytes(new_entry, "utf-8"))
 
-        print("Made it past packet bytes step")
+        print("\nMade it past packet to bytes loop step\n")
         print("Packets is: {}".format(packets))
-
+        sending_socket = self.open_sockets[0]
+        print("pre destination")
         for destination in dest_list:
-            for packet in packets:
+            print("NEW DESTINATION-----------\nDest: {}".format(destination))
+            print("connecting to router\ndestination[1] is: {}".format(destination[1]))
+            sending_socket.connect(destination)
+            print("connected to router")
+            for pack in packets:
                 print("about to send packet")
-                print("self.open_sockets are: {}\nself.open_sockets[0] is: {}\nself.open_sockets[0].port is: {}".format(self.open_sockets, self.open_sockets[0], self.open_sockets[0].port()))
-                self.open_sockets[0].sendto(packet, destination)
+                print("self.open_sockets are: {}\nsending_socket is: {}".format(self.open_sockets, sending_socket))
+                # Connect to the router
+
+
+                # And then send
+                self.open_sockets[0].sendto(pack, destination)
                 print("packet sent!!")
 
     # Infinite Loop
