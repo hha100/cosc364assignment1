@@ -52,16 +52,6 @@ def main():
 
     print()
 
-    # print() print("Routing table object, plus filename and entries are:\n{}\n{}\n{}".format(rip_table, rip_table.config_file, rip_table.entries))   # for debugging
-
-    # print("\nInitial routing table entries are as follows:\n")
-    #
-    # i = 1
-    # for entry in rip_table.get_table():
-    #     print(i)
-    #     print(entry)
-    #     i += 1
-
     # Do the main loop of the routing daemon here after config file parsed, routers initialised, and initial routing table populated.
     dae = daemon.Daemon()
     dae.start_loop(config_filename)

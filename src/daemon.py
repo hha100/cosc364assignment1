@@ -117,16 +117,18 @@ class Daemon:
         packets = []
         sending_socket = self.open_sockets[0]
         for entry in table_entries:
-            #print(entry)
+            print(entry)
             new_entry = self.entry_to_string(entry)
             
-            packets.append(repr(new_entry).encode('utf-8'))
+            new_encoded_entry = new_entry.encode()
+
+            packets.append(new_encoded_entry)
 
         # print("\nMade it past entries to data loop of broadcast_table\n")
         # print("Packets is: {}".format(packets))
         for destination in dest_list:
             # print("Destination to send packet to: {}\nConnecting to router...".format(destination))
-            sending_socket.connect(destination)
+            # sending_socket.connect(destination)
             # print("Connected to router {}".format(destination))
             for pack in packets:
                 # print("Top of for pack in packets loop (broadcast)\nSending packet...")
@@ -134,6 +136,7 @@ class Daemon:
                 # Connect to the router
 
                 # And then send
+                # print("Sending...")
                 sending_socket.sendto(pack, destination)
                 # print("packet sent!!")
 
