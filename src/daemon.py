@@ -141,6 +141,7 @@ class Daemon:
                 # And then send
                 self.open_sockets[0].sendto(pack, destination)
                 print("packet sent!!")
+        print("\n---------Finished broadcasting table. -----------\n")
 
     # Infinite Loop
 
@@ -171,7 +172,7 @@ class Daemon:
                     # Uncomment the below code to run broadcast_table in while loop
                     self.broadcast_table()
                     # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
-                    readable, writable, exceptional = select.select(self.open_sockets, [], self.open__sockets, 2)
+                    readable, writable, exceptional = select.select(self.open_sockets, [], self.open_sockets, 2)
                     print(
                         "Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,
                                                                                                         writable,
