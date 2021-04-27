@@ -97,8 +97,8 @@ class Daemon:
         # print("...But there's no sending logic yet")
         # print("Sending my routing table to all neighbours...")
 
-        ip = "localhost"
-        dest_list = []
+        ip = 'localhost'
+        #dest_list = []
 
         # Get list of neighbours/direct connections
         # Create list of neighbours
@@ -106,6 +106,7 @@ class Daemon:
             # print("----OUTPORT PORT BEING ADDED TO DEST_LIST: {}".format(output_port[0]))
             dest = (ip, output_port[0])
             dest_list.append(dest)
+            
         # ToDo: we want dest_list = list of ip addresses and their ports [(ip, port), (ip, port)]
         # print("Made it past 1st for loop, dest_list created")
         # print("dest_list is: {}".format(dest_list))
