@@ -38,13 +38,16 @@ class Daemon:
         self.rip_table = []
         self.input_ports = []
         self.output_ports = []
+        self.open_sockets = []
 
     def init(self, input_ports):
         # Set up a UDP socket for each input ports (none needed for output ports)
         input_sockets = []
         for index in range(len(input_ports)):
+
             portnum = input_ports[index]
             daemon = connect_socket(portnum)
+            # print("index: {}\ndaemon: {}".format(index, daemon))
             # daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             # daemon.bind(('localhost', portnum))
             # daemon.setblocking(False)
@@ -128,7 +131,8 @@ class Daemon:
         for destination in dest_list:
             for packet in packets:
                 print("about to send packet")
-                input_sockets[0].sendto(packet, destination)
+                print("self.open_sockets are: {}\nself.open_sockets[0] is: {}\nself.open_sockets[0].port is: {}".format(self.open_sockets, self.open_sockets[0], self.open_sockets[0].port()))
+                self.open_sockets[0].sendto(packet, destination)
                 print("packet sent!!")
 
     # Infinite Loop
@@ -138,6 +142,7 @@ class Daemon:
         config_filename, router_id, self.input_ports, self.output_ports, timeouts = configparser.parse(config_filename)
         self.rip_table = routingtable.init_table(config_filename, self.output_ports)
         input_sockets = self.init(self.input_ports)
+        self.open_sockets = input_sockets
         print("output ports!!!")
         for op in self.output_ports:
             print("op: {}".format(op))
@@ -153,13 +158,13 @@ class Daemon:
                 # rip_table = compare_tables(rip_table, incoming_table)
                 # break
 
-                # If input_sockets is not empty, run the select() function to listen to all sockets at the same time
-                if input_sockets:
-                    print("input_sockets is:\n{}".format(input_sockets))
+                # If self.open_sockets is not empty, run the select() function to listen to all sockets at the same time
+                if self.open_sockets:
+                    print("self.open_sockets is:\n{}".format(self.open_sockets))
                     # Uncomment the below code to run broadcast_table in while loop
-                    self.broadcast_table(input_sockets)
+                    self.broadcast_table()
                     # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
-                    readable, writable, exceptional = select.select(input_sockets, [], input_sockets, 2)
+                    readable, writable, exceptional = select.select(self.open_sockets, [], self.open__sockets, 2)
                     print(
                         "Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,
                                                                                                         writable,
