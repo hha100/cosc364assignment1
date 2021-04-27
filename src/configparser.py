@@ -14,8 +14,7 @@ def parse(config_filename):
 
     try:
         for index in range(len(config_lines)):
-            config_lines[index] = [x.strip("\n") for x in config_lines[index].split(
-                " ")]  # Split each line into strings and strip any newline characters
+            config_lines[index] = [x.strip("\n") for x in config_lines[index].split(" ")]  # Split each line into strings and strip any newline characters
     except:
         print("Incorrect line format on line {} of config file.\n".format(index))
         sys.exit()  # Exit the program with an error message if there is a line in the config file that cannot be split into strings
@@ -71,8 +70,7 @@ def parse(config_filename):
                 for index in range(1, len(line)):
                     output = line[index].split("-")
                     if len(output) != 3:
-                        print(
-                            "ERROR: The length of an output port definition is of incorrent length. Make sure output ports are of the form PORT-METRIC-ROUTER ID.\n")
+                        print("ERROR: The length of an output port definition is of incorrent length. Make sure output ports are of the form PORT-METRIC-ROUTER ID.\n")
                         sys.exit()
                     elif output[0].isnumeric() == False or output[1].isnumeric() == False or output[
                         2].isnumeric() == False:
@@ -110,8 +108,7 @@ def parse(config_filename):
                 else:
                     timeouts[0] = int(line[1])
                     timeouts[1] = int(timeouts[0] / 6)
-                print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(
-                    timeouts[0], timeouts[1]))
+                print("Timeout and periodic timer intervals are assigned to {} seconds and {} seconds\n".format(timeouts[0], timeouts[1]))
 
 
         error_msg = ""
