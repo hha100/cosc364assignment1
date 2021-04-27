@@ -117,7 +117,7 @@ class Daemon:
         packets = []
         sending_socket = self.open_sockets[0]
         for entry in table_entries:
-            print(entry)
+            # print(entry)
             new_entry = self.entry_to_string(entry)
             new_encoded_entry = new_entry.encode()
 
@@ -148,10 +148,6 @@ class Daemon:
         self.rip_table = routingtable.init_table(config_filename, self.output_ports)
         input_sockets = self.init(self.input_ports)
         self.open_sockets = input_sockets
-        print("output ports!!!")
-        for op in self.output_ports:
-            print("op: {}".format(op))
-
         try:
             while True:
                 # use select() to block until events occur
