@@ -153,85 +153,87 @@ class Daemon:
         for op in self.output_ports:
             print("op: {}".format(op))
 
-        #try:
-        while True:
-            # use select() to block until events occur
-            print("while loop")
-            # Check our neighbour routers and make sure we can still access them all
-            # Send out the current table
-            
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            for entry in self.rip_table.entries:
-                print(entry)
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            
-            # If a table is received from another router....
-            # rip_table = compare_tables(rip_table, incoming_table)
-            # break
-
-            # If self.open_sockets is not empty, run the select() function to listen to all sockets at the same time
-            if self.open_sockets:
-                #print("self.open_sockets is:\n{}".format(self.open_sockets))
-                # ToDo: Timer
-                print("\nBroadcasting table....")
-                self.broadcast_table()
-                print("Finished broadcasting table.\n")
-                # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
-                readable, writable, exceptional = select.select(self.open_sockets, [], self.open_sockets, 2)
-                #print("Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,  writable, exceptional))
-                rec_socket = self.open_sockets[0]
-                rec_port = rec_socket.getsockname()[1]
-                #print("Rec port: {}".format(rec_port))
-                for s in readable:
-                    print("Start of for s in readable loop")
-                    if s:
-                        print("we are s: {}".format(s))
-                        #try:
-                        data, addr = s.recvfrom(128)
-                        #except socket.error:
-                            #print("socket.error")
-                            #pass
-                        #except socket.herror:
-                            #print("socket.herror")
-                            #pass
-                        #except socket.gaierror:
-                            #print("socket.gaierror")
-                            #pass
-                        #except socket.timeout:
-                            #print("socket.timeout")
-                            #pass
-                        #except:
-                            #print("other socket error with recvfrom")
-                    else:
-                        print("was not s")
-
-                print("for s in readable:\nData: {}\nAddr: {}".format(data, addr))
-                print("Decoded data: {}".format(data.decode('utf-8')))
-                    # Create and send response
-
-                # Triggered update code here (?)
-
-                # connection, client_address = s.accept()
-
-                # response = into_packet(
-                # if response is not None:
-                #     s.sendto(byte_message, (client_ip_address, port_number))
-                # s.sendto(encoded_message, target_destination)
-
-                for s in exceptional:
-                    print("Select() exceptional error. Exceptional: {}\ns: {}".format(exceptional, s))
-
-                print("sleeping...")
-                # To set periodic timer (usually 30secs)
-                # time.sleep(self.timeouts[1])
-                time.sleep(7)
-                print("awake")
-
-                # Look into python's socket import receive and send functions
-        #except KeyboardInterrupt:
-            #print("User aborted program with Ctrl C")
-            #pass
-        #except:
-            #print("An error occurred (exception in daemon start_loop)")
-            #pass
-            ## sys.exit()
+        try:
+            while True:
+                # use select() to block until events occur
+                print("while loop")
+                # Check our neighbour routers and make sure we can still access them all
+                # Send out the current table
+                
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                for entry in self.rip_table.entries:
+                    print(entry)
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                
+                # If a table is received from another router....
+                # rip_table = compare_tables(rip_table, incoming_table)
+                # break
+    
+                # If self.open_sockets is not empty, run the select() function to listen to all sockets at the same time
+                if self.open_sockets:
+                    #print("self.open_sockets is:\n{}".format(self.open_sockets))
+                    # ToDo: Timer
+                    print("\nBroadcasting table....")
+                    self.broadcast_table()
+                    print("Finished broadcasting table.\n")
+                    # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
+                    readable, writable, exceptional = select.select(self.open_sockets, [], self.open_sockets, 2)
+                    #print("Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,  writable, exceptional))
+                    rec_socket = self.open_sockets[0]
+                    rec_port = rec_socket.getsockname()[1]
+                    #print("Rec port: {}".format(rec_port))
+                    data, addr = False, ""
+                    for s in readable:
+                        print("Start of for s in readable loop")
+                        if s:
+                            print("we are s: {}".format(s))
+                            try:
+                                data, addr = s.recvfrom(128)
+                            except socket.error:
+                                print("socket.error")
+                                pass
+                            except socket.herror:
+                                print("socket.herror")
+                                pass
+                            except socket.gaierror:
+                                print("socket.gaierror")
+                                pass
+                            except socket.timeout:
+                                print("socket.timeout")
+                                pass
+                            except:
+                                print("other socket error with recvfrom")
+                        else:
+                            print("was not s")
+                    
+                    if data:
+                        print("for s in readable:\nData: {}\nAddr: {}".format(data, addr))
+                        print("Decoded data: {}".format(data.decode('utf-8')))
+                        # Create and send response
+    
+                    # Triggered update code here (?)
+    
+                    # connection, client_address = s.accept()
+    
+                    # response = into_packet(
+                    # if response is not None:
+                    #     s.sendto(byte_message, (client_ip_address, port_number))
+                    # s.sendto(encoded_message, target_destination)
+    
+                    for s in exceptional:
+                        print("Select() exceptional error. Exceptional: {}\ns: {}".format(exceptional, s))
+    
+                    print("sleeping...")
+                    # To set periodic timer (usually 30secs)
+                    # time.sleep(self.timeouts[1])
+                    time.sleep(7)
+                    print("awake")
+    
+                    # Look into python's socket import receive and send functions
+        except KeyboardInterrupt:
+            print("User aborted program with Ctrl C")
+            pass
+        except:
+            print("An error occurred (exception in daemon start_loop)")
+            pass
+            # sys.exit()
