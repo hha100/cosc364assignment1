@@ -175,9 +175,7 @@ class Daemon:
                     # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
                     readable, writable, exceptional = select.select(self.open_sockets, [], self.open_sockets, 2)
                     print(
-                        "Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,
-                                                                                                        writable,
-                                                                                                        exceptional))
+                        "Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable, writable, exceptional))
                     # for s in readable:
 
                     # connection, client_address = s.accept()
