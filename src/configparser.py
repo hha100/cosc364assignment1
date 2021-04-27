@@ -34,13 +34,13 @@ def parse(config_filename):
 
                 if router_id == None:
                     if line[1].isnumeric() == False:
-                        print("Router ID must be an integer.\n")
+                        print("Router ID must be a positive integer.\n")
                         sys.exit()
                     if int(line[1]) not in range(1, 64001):
                         print("Router ID must be between 1 and 64000.")
                         sys.exit()
                     else:
-                        router_id = line[1]
+                        router_id = int(line[1])
                         print("Router ID assigned to {}\n".format(router_id))
                 else:
                     print("Router ID must only be assigned once.\n")
@@ -70,7 +70,7 @@ def parse(config_filename):
                 for index in range(1, len(line)):
                     output = line[index].split("-")
                     if len(output) != 3:
-                        print("ERROR: The length of an output port definition is of incorrent length. Make sure output ports are of the form PORT-METRIC-ROUTER ID.\n")
+                        print("ERROR: The length of an output port definition is of incorrect length. Make sure output ports are of the form PORT-METRIC-ROUTER ID.\n")
                         sys.exit()
                     elif output[0].isnumeric() == False or output[1].isnumeric() == False or output[
                         2].isnumeric() == False:
@@ -100,7 +100,7 @@ def parse(config_filename):
             # If the line being read is assigning the timeout interval
             elif first_str == "timeout":
                 if line[1].isnumeric() == False:
-                    print("ERROR: Timeout value is not an integer.\n")
+                    print("ERROR: Timeout value is not a positive integer.\n")
                     sys.exit()
                 elif int(line[1]) not in range(10, 181):
                     print("ERROR: Timeout interval must be an integer between 10 and 180 seconds.\n")

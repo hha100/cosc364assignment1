@@ -170,10 +170,7 @@ class Daemon:
                     print("Finished broadcasting table.\n")
                     # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
                     readable, writable, exceptional = select.select(self.open_sockets, [], self.open_sockets, 2)
-                    print(
-                        "Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,
-                                                                                                        writable,
-                                                                                                        exceptional))
+                    print("Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,  writable, exceptional))
                     rec_socket = self.open_sockets[0]
                     rec_port = rec_socket.getsockname()[1]
                     print("Rec port: {}".format(rec_port))
