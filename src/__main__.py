@@ -63,7 +63,8 @@ def main():
     #     i += 1
 
     # Do the main loop of the routing daemon here after config file parsed, routers initialised, and initial routing table populated.
-    daemon.start_loop(config_filename)
+    dae = daemon.Daemon()
+    dae.start_loop(config_filename)
 
     # If a table is received from another router....
     #
