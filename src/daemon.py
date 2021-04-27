@@ -158,24 +158,29 @@ class Daemon:
                 print("while loop")
                 # Check our neighbour routers and make sure we can still access them all
                 # Send out the current table
-
+                
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                for entry in self.rip_table.entries:
+                    print(entry)
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                
                 # If a table is received from another router....
                 # rip_table = compare_tables(rip_table, incoming_table)
                 # break
 
                 # If self.open_sockets is not empty, run the select() function to listen to all sockets at the same time
                 if self.open_sockets:
-                    print("self.open_sockets is:\n{}".format(self.open_sockets))
+                    #print("self.open_sockets is:\n{}".format(self.open_sockets))
                     # ToDo: Timer
                     print("\nBroadcasting table....")
                     self.broadcast_table()
                     print("Finished broadcasting table.\n")
                     # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
                     readable, writable, exceptional = select.select(self.open_sockets, [], self.open_sockets, 2)
-                    print("Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,  writable, exceptional))
+                    #print("Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,  writable, exceptional))
                     rec_socket = self.open_sockets[0]
                     rec_port = rec_socket.getsockname()[1]
-                    print("Rec port: {}".format(rec_port))
+                    #print("Rec port: {}".format(rec_port))
                     for s in readable:
                         print("Start of for s in readable loop")
                         if s:
