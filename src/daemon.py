@@ -9,19 +9,44 @@ def connect_socket(input_port):
     return daemon
 
 
+def entry_to_string(rip_entry):
+    destination, costs, next_hop, flag, came_from = rip_entry.get_info()
+    string = "{0}_{1}_{2}_{3}_{4}".format(destination, costs, next_hop, flag, came_from)
+    print("entry_to_string is: {}".format(string))
+    return string
+
+
+def string_to_entry(string):
+
+    # Split the string into entry values and generate a new RIPEntry
+    entry = routingtable.RIPEntry()
+    values = string.split("_")
+    entry.destination = values[0]
+    entry.costs = values[1]
+    entry.next_hop = values[2]
+    entry.flag = values[3]
+    # ToDo: Change the came_from here? or should this be done somewhere else? let's see....
+    entry.came_from = values[4]
+    print("Finished parsing string to entry. RIPEntry is:\n{}".format(entry))
+    return entry
+
+
 class Daemon:
 
     def __init__(self):
         self.rip_table = []
         self.input_ports = []
         self.output_ports = []
+        self.open_sockets = []
 
     def init(self, input_ports):
         # Set up a UDP socket for each input ports (none needed for output ports)
         input_sockets = []
         for index in range(len(input_ports)):
+
             portnum = input_ports[index]
             daemon = connect_socket(portnum)
+            # print("index: {}\ndaemon: {}".format(index, daemon))
             # daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             # daemon.bind(('localhost', portnum))
             # daemon.setblocking(False)
@@ -78,19 +103,17 @@ class Daemon:
 
         # Get list of neighbours/direct connections
         # Create list of neighbours
-        
-        #for output_port in self.output_ports:
-            #dest = (ip, output_port)
-            #dest_list.append(dest)
+        for output_port in self.output_ports:
+            print("----OUTPORT PORT BEING ADDED TO DEST_LIST: {}".format(output_port[0]))
+            dest = (ip, output_port[0])
+            dest_list.append(dest)
             
-        dest_list = [(ip, x) for x in self.output_ports]
-        
         # ToDo: we want dest_list = list of ip addresses and their ports [(ip, port), (ip, port)]
         print("Made it past 1st for loop")
+        print("dest_list is: {}".format(dest_list))
 
         # Create packet with table to send
         # Turn RIP table into data to send
-        print("self.rip_table is: {0}\nself.rip_table.entries is: {1}".format(self.rip_table, self.rip_table.entries))
         table_data = ''
         # table_data = packet.table_to_packet(self.rip_table)
         table_entries = self.rip_table.entries
@@ -98,12 +121,28 @@ class Daemon:
         packets = []
         for entry in table_entries:
             print(entry)
-            # packets.append(bytes(entry, "utf-8"))
+            new_entry = entry_to_string(entry)
+            packets.append(bytes(new_entry, "utf-8"))
 
-        print("Made it past packet bytes step")
+        print("\nMade it past packet to bytes loop step\n")
+        print("Packets is: {}".format(packets))
+        sending_socket = self.open_sockets[0]
+        print("pre destination")
+        for destination in dest_list:
+            print("NEW DESTINATION-----------\nDest: {}".format(destination))
+            print("connecting to router\ndestination[1] is: {}".format(destination[1]))
+            sending_socket.connect(destination)
+            print("connected to router")
+            for pack in packets:
+                print("about to send packet")
+                print("self.open_sockets are: {}\nsending_socket is: {}".format(self.open_sockets, sending_socket))
+                # Connect to the router
 
-        # for destination in dest_list:
-        #     input_sockets[0].sendto(packet, destination)
+
+                # And then send
+                self.open_sockets[0].sendto(pack, destination)
+                print("packet sent!!")
+        print("\n---------Finished broadcasting table. -----------\n")
 
     # Infinite Loop
 
@@ -112,6 +151,7 @@ class Daemon:
         config_filename, router_id, self.input_ports, self.output_ports, timeouts = configparser.parse(config_filename)
         self.rip_table = routingtable.init_table(config_filename, self.output_ports)
         input_sockets = self.init(self.input_ports)
+        self.open_sockets = input_sockets
         print("output ports!!!")
         for op in self.output_ports:
             print("op: {}".format(op))
@@ -127,13 +167,13 @@ class Daemon:
                 # rip_table = compare_tables(rip_table, incoming_table)
                 # break
 
-                # If input_sockets is not empty, run the select() function to listen to all sockets at the same time
-                if input_sockets:
-                    print("input_sockets is:\n{}".format(input_sockets))
+                # If self.open_sockets is not empty, run the select() function to listen to all sockets at the same time
+                if self.open_sockets:
+                    print("self.open_sockets is:\n{}".format(self.open_sockets))
                     # Uncomment the below code to run broadcast_table in while loop
-                    self.broadcast_table(input_sockets)
+                    self.broadcast_table()
                     # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
-                    readable, writable, exceptional = select.select(input_sockets, [], input_sockets, 2)
+                    readable, writable, exceptional = select.select(self.open_sockets, [], self.open_sockets, 2)
                     print(
                         "Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,
                                                                                                         writable,
