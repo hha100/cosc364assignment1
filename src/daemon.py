@@ -117,7 +117,7 @@ class Daemon:
         packets = []
         sending_socket = self.open_sockets[0]
         for entry in table_entries:
-            print(entry)
+            # print(entry)
             new_entry = self.entry_to_string(entry)
             
             new_encoded_entry = new_entry.encode()
