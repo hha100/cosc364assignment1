@@ -50,7 +50,6 @@ def main():
 
     config_filename = str(sys.argv[1])
 
-
     print()
 
     # print() print("Routing table object, plus filename and entries are:\n{}\n{}\n{}".format(rip_table, rip_table.config_file, rip_table.entries))   # for debugging
@@ -66,8 +65,8 @@ def main():
     # Do the main loop of the routing daemon here after config file parsed, routers initialised, and initial routing table populated.
     daemon.start_loop(config_filename)
 
-            # If a table is received from another router....
-            #
+    # If a table is received from another router....
+    #
     # compare_tables(rip_table, incoming_table)
     # break
     # except:

@@ -1,4 +1,4 @@
-import sys, socket, routingtable, configparser, select
+import sys, socket, routingtable, configparser, select, protocol
 
 
 def init(input_ports):
@@ -6,9 +6,10 @@ def init(input_ports):
     input_sockets = []
     for index in range(len(input_ports)):
         portnum = input_ports[index]
-        daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        daemon.bind(('localhost', portnum))
-        daemon.setblocking(False)
+        daemon = connect_socket(portnum)
+        # daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # daemon.bind(('localhost', portnum))
+        # daemon.setblocking(False)
         input_sockets.append(daemon)
 
     # print("The socket info is:\n", [x.getsockname() for x in input_sockets])
@@ -19,6 +20,14 @@ def init(input_ports):
         print("Socket created on network {} with port number {}.".format(network, portnum))
 
     return input_sockets
+
+
+def connect_socket(input_port):
+    # Create TCP/IP socket and binds to the given port
+    daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    daemon.setblocking(False)
+    daemon.bind(('localhost', input_port))
+    return daemon
 
 
 def compare_tables(rip_table, incoming_table):
@@ -51,12 +60,24 @@ def compare_tables(rip_table, incoming_table):
     # print("{0} \n {1} \n {2} \n {3} \n {4}".format(destination, costs, next_hop, flag, came_from))  # For debugging
 
 
-def send_table(rip_table):
+def broadcast_table(rip_table, input_sockets):
     print("Attempting to send my table to all neighbours...")
     print("...But there's no sending logic yet")
-    # Get list of neighbours
+
+    # Get list of neighbours/direct connections
+    for sock in input_sockets:
+        
+
+    # ToDo: we want dest_list = list of ip addresses and their ports [(ip, port), (ip, port)]
+    dest_list = []
+
     # Create packet with table to send
+    packet = bytes(rip_table, "utf-8")
+
     # Send packet to each neighbour
+    for sockets in input_sockets:
+        for destination in dest_list:
+            sockets.sendto(packet, destination)
 
 
 # Infinite Loop
@@ -73,7 +94,7 @@ def start_loop(config_filename):
             print("while loop")
             # Check our neighbour routers and make sure we can still access them all
             # Send out the current table
-            send_table(rip_table)
+
             # If a table is received from another router....
             # rip_table = compare_tables(rip_table, incoming_table)
             # break
@@ -81,17 +102,29 @@ def start_loop(config_filename):
             # If input_sockets is not empty, run the select() function to listen to all sockets at the same time
             if input_sockets:
                 print("input_sockets is:\n{}".format(input_sockets))
-                # ToDo: remove the number 5 and have a variable in its place
-                readable, writable, exceptional = select.select(input_sockets, [], input_sockets, 5)
+                broadcast_table(rip_table, input_sockets)
+                # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
+                readable, writable, exceptional = select.select(input_sockets, [], input_sockets, 2)
                 print(
                     "Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable, writable,
                                                                                                     exceptional))
+                for s in readable:
 
-            for socket in exceptional:
-                print("Select() exceptional error\nsocket: {}".format(socket))
+                    # connection, client_address = s.accept()
+
+
+                    # response = into_packet(
+                    # if response is not None:
+                    #     s.sendto(byte_message, (client_ip_address, port_number))
+                    s.sendto(encoded_message, target_destination)
+
+                for s in exceptional:
+                    print("Select() exceptional error\nsocket: {}".format(socket))
 
             # Look into python's socket import receive and send functions
-
+    except KeyboardInterrupt:
+        print("User aborted program with Ctrl C")
+        pass
     except:
         print("An error occurred (exception in daemon start_loop)")
         sys.exit()
