@@ -1,6 +1,14 @@
 import sys, socket, routingtable, configparser, select, packet
 
 
+def connect_socket(input_port):
+    # Create TCP/IP socket and binds to the given port
+    daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # daemon.setblocking(False)
+    daemon.bind(('localhost', input_port))
+    return daemon
+
+
 class Daemon:
 
     def __init__(self):
@@ -13,7 +21,7 @@ class Daemon:
         input_sockets = []
         for index in range(len(input_ports)):
             portnum = input_ports[index]
-            daemon = self.connect_socket(portnum)
+            daemon = connect_socket(portnum)
             # daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             # daemon.bind(('localhost', portnum))
             # daemon.setblocking(False)
@@ -27,13 +35,6 @@ class Daemon:
             print("Socket created on network {} with port number {}.".format(network, portnum))
 
         return input_sockets
-
-    def connect_socket(self, input_port):
-        # Create TCP/IP socket and binds to the given port
-        daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        daemon.setblocking(False)
-        daemon.bind(('localhost', input_port))
-        return daemon
 
     def compare_tables(self, incoming_table):
         """
@@ -85,13 +86,20 @@ class Daemon:
 
         # Create packet with table to send
         # Turn RIP table into data to send
+        print("self.rip_table is: {0}\nself.rip_table.entries is: {1}".format(self.rip_table, self.rip_table.entries))
         table_data = ''
-        print("self.rip_table is: {}".format(self.rip_table))
-        packet = bytes(table_data, "utf-8")
+        # table_data = packet.table_to_packet(self.rip_table)
+        table_entries = self.rip_table.entries
+        print("ENTRIES in self.rip_table.entries:\n")
+        packets = []
+        for entry in table_entries:
+            print(entry)
+            # packets.append(bytes(entry, "utf-8"))
+
         print("Made it past packet bytes step")
 
-        for destination in dest_list:
-            input_sockets[0].sendto(packet, destination)
+        # for destination in dest_list:
+        #     input_sockets[0].sendto(packet, destination)
 
     # Infinite Loop
 
@@ -119,7 +127,7 @@ class Daemon:
                 if input_sockets:
                     print("input_sockets is:\n{}".format(input_sockets))
                     # Uncomment the below code to run broadcast_table in while loop
-                    # self.broadcast_table(input_sockets, self.output_ports)
+                    self.broadcast_table(input_sockets)
                     # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
                     readable, writable, exceptional = select.select(input_sockets, [], input_sockets, 2)
                     print(
