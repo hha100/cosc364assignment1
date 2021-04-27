@@ -98,7 +98,7 @@ class Daemon:
         # print("Sending my routing table to all neighbours...")
 
         ip = 'localhost'
-        #dest_list = []
+        dest_list = []
 
         # Get list of neighbours/direct connections
         # Create list of neighbours
@@ -196,6 +196,9 @@ class Daemon:
 
                     # for s in exceptional:
                     #    print("Select() exceptional error\nsocket: {}".format(socket))
+                    print("sleeping...")
+                    time.sleep(10)
+                    print("awake")
 
                 # Look into python's socket import receive and send functions
         except KeyboardInterrupt:
