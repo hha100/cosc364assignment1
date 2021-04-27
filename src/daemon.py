@@ -1,4 +1,4 @@
-import sys, socket, routingtable, configparser, select, packet
+import sys, socket, routingtable, configparser, select, packet, time
 
 
 def connect_socket(input_port):
@@ -9,15 +9,7 @@ def connect_socket(input_port):
     return daemon
 
 
-def entry_to_string(rip_entry):
-    destination, costs, next_hop, flag, came_from = rip_entry.get_info()
-    string = "{0}_{1}_{2}_{3}_{4}".format(destination, costs, next_hop, flag, came_from)
-    print("entry_to_string is: {}".format(string))
-    return string
-
-
 def string_to_entry(string):
-
     # Split the string into entry values and generate a new RIPEntry
     entry = routingtable.RIPEntry()
     values = string.split("_")
@@ -38,12 +30,13 @@ class Daemon:
         self.input_ports = []
         self.output_ports = []
         self.open_sockets = []
+        self.router_id = None
+        self.timeouts = None
 
     def init(self, input_ports):
         # Set up a UDP socket for each input ports (none needed for output ports)
         input_sockets = []
         for index in range(len(input_ports)):
-
             portnum = input_ports[index]
             daemon = connect_socket(portnum)
             # print("index: {}\ndaemon: {}".format(index, daemon))
@@ -60,6 +53,13 @@ class Daemon:
             print("Socket created on network {} with port number {}.".format(network, portnum))
 
         return input_sockets
+
+    def entry_to_string(self, rip_entry):
+        destination, costs, next_hop, flag, came_from = rip_entry.get_info()
+        came_from = self.router_id
+        string = "{0}_{1}_{2}_{3}_{4}".format(destination, costs, next_hop, flag, came_from)
+        # print("entry_to_string created! value: {}".format(string))
+        return string
 
     def compare_tables(self, incoming_table):
         """
@@ -96,59 +96,57 @@ class Daemon:
     def broadcast_table(self, input_sockets=[]):
         # print("Attempting to send my table to all neighbours...")
         # print("...But there's no sending logic yet")
-        print("Sending my routing table to all neighbours...")
+        # print("Sending my routing table to all neighbours...")
 
         ip = 'localhost'
-        #dest_list = []
+        dest_list = []
 
         # Get list of neighbours/direct connections
         # Create list of neighbours
         for output_port in self.output_ports:
-            print("----OUTPORT PORT BEING ADDED TO DEST_LIST: {}".format(output_port[0]))
+            # print("----OUTPORT PORT BEING ADDED TO DEST_LIST: {}".format(output_port[0]))
             dest = (ip, output_port[0])
             dest_list.append(dest)
-            
+
         # ToDo: we want dest_list = list of ip addresses and their ports [(ip, port), (ip, port)]
-        print("Made it past 1st for loop")
-        print("dest_list is: {}".format(dest_list))
+        # print("Made it past 1st for loop, dest_list created")
+        # print("dest_list is: {}".format(dest_list))
 
         # Create packet with table to send
         # Turn RIP table into data to send
-        table_data = ''
+        # table_data = ''
         # table_data = packet.table_to_packet(self.rip_table)
         table_entries = self.rip_table.entries
-        print("ENTRIES in self.rip_table.entries:\n")
+        # print("ENTRIES in self.rip_table.entries:\n")
         packets = []
+        sending_socket = self.open_sockets[0]
         for entry in table_entries:
-            print(entry)
-            new_entry = entry_to_string(entry)
+            # print(entry)
+            new_entry = self.entry_to_string(entry)
+
             packets.append(bytes(new_entry, "utf-8"))
 
-        print("\nMade it past packet to bytes loop step\n")
-        print("Packets is: {}".format(packets))
-        sending_socket = self.open_sockets[0]
-        print("pre destination")
+        # print("\nMade it past entries to data loop of broadcast_table\n")
+        # print("Packets is: {}".format(packets))
         for destination in dest_list:
-            print("NEW DESTINATION-----------\nDest: {}".format(destination))
-            print("connecting to router\ndestination[1] is: {}".format(destination[1]))
+            # print("Destination to send packet to: {}\nConnecting to router...".format(destination))
             sending_socket.connect(destination)
-            print("connected to router")
+            # print("Connected to router {}".format(destination))
             for pack in packets:
-                print("about to send packet")
-                print("self.open_sockets are: {}\nsending_socket is: {}".format(self.open_sockets, sending_socket))
+                # print("Top of for pack in packets loop (broadcast)\nSending packet...")
+                # print("self.open_sockets are: {}\nsending_socket is: {}".format(self.open_sockets, sending_socket))
                 # Connect to the router
 
-
                 # And then send
-                self.open_sockets[0].sendto(pack, destination)
-                print("packet sent!!")
-        print("\n---------Finished broadcasting table. -----------\n")
+                sending_socket.sendto(pack, destination)
+                # print("packet sent!!")
 
     # Infinite Loop
 
     def start_loop(self, config_filename):
         print("initializing... (start of loop function, before loop)")
-        config_filename, router_id, self.input_ports, self.output_ports, timeouts = configparser.parse(config_filename)
+        config_filename, self.router_id, self.input_ports, self.output_ports, self.timeouts = configparser.parse(config_filename)
+        print("timeouts: {}".format(self.timeouts))
         self.rip_table = routingtable.init_table(config_filename, self.output_ports)
         input_sockets = self.init(self.input_ports)
         self.open_sockets = input_sockets
@@ -170,13 +168,23 @@ class Daemon:
                 # If self.open_sockets is not empty, run the select() function to listen to all sockets at the same time
                 if self.open_sockets:
                     print("self.open_sockets is:\n{}".format(self.open_sockets))
-                    # Uncomment the below code to run broadcast_table in while loop
+                    # ToDo: Timer
+                    print("\nBroadcasting table....")
                     self.broadcast_table()
+                    print("Finished broadcasting table.\n")
                     # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
                     readable, writable, exceptional = select.select(self.open_sockets, [], self.open_sockets, 2)
-                    print(
-                        "Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable, writable, exceptional))
-                    # for s in readable:
+                    print("Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,  writable, exceptional))
+                    rec_socket = self.open_sockets[0]
+                    rec_port = rec_socket.getsockname()[1]
+                    print("Rec port: {}".format(rec_port))
+                    for s in readable:
+                        print("Start of for s in readable loop")
+                        # data, addr = s.recvfrom(rec_port)
+                        # print("for s in readable:\nData: {}\nAddr: {}".format(data, addr))
+                        # Create and send response
+
+                    # Triggered update code here (?)
 
                     # connection, client_address = s.accept()
 
@@ -185,8 +193,14 @@ class Daemon:
                     #     s.sendto(byte_message, (client_ip_address, port_number))
                     # s.sendto(encoded_message, target_destination)
 
-                    # for s in exceptional:
-                    #    print("Select() exceptional error\nsocket: {}".format(socket))
+                    for s in exceptional:
+                        print("Select() exceptional error. Exceptional: {}\ns: {}".format(exceptional, s))
+
+                    print("sleeping...")
+                    # To set periodic timer (usually 30secs)
+                    # time.sleep(self.timeouts[1])
+                    time.sleep(7)
+                    print("awake")
 
                 # Look into python's socket import receive and send functions
         except KeyboardInterrupt:
