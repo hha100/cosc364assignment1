@@ -4,7 +4,7 @@ import sys, socket, routingtable, configparser, select, packet, time
 def connect_socket(input_port):
     # Create TCP/IP socket and binds to the given port
     daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    # daemon.setblocking(False)
+    daemon.setblocking(True)
     daemon.bind(('localhost', input_port))
     return daemon
 
@@ -39,10 +39,6 @@ class Daemon:
         for index in range(len(input_ports)):
             portnum = input_ports[index]
             daemon = connect_socket(portnum)
-            # print("index: {}\ndaemon: {}".format(index, daemon))
-            # daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            # daemon.bind(('localhost', portnum))
-            # daemon.setblocking(False)
             input_sockets.append(daemon)
 
         # print("The socket info is:\n", [x.getsockname() for x in input_sockets])
@@ -183,8 +179,29 @@ class Daemon:
                     print("Rec port: {}".format(rec_port))
                     for s in readable:
                         print("Start of for s in readable loop")
-                        # data, addr = s.recvfrom(rec_port)
-                        # print("for s in readable:\nData: {}\nAddr: {}".format(data, addr))
+                        if s:
+                            print("we are s: {}".format(s))
+                            try:
+                                data, addr = s.recvfrom(128)
+                            except socket.error:
+                                print("socket.error")
+                                pass
+                            except socket.herror:
+                                print("socket.herror")
+                                pass
+                            except socket.gaierror:
+                                print("socket.gaierror")
+                                pass
+                            except socket.timeout:
+                                print("socket.timeout")
+                                pass
+                            except:
+                                print("other socket error with recvfrom")
+                        else:
+                            print("was not s")
+
+                    print("for s in readable:\nData: {}\nAddr: {}".format(data, addr))
+                    print("Decoded data: {}".format(data.decode()))
                         # Create and send response
 
                     # Triggered update code here (?)
@@ -211,4 +228,5 @@ class Daemon:
             pass
         except:
             print("An error occurred (exception in daemon start_loop)")
-            sys.exit()
+            pass
+            # sys.exit()
