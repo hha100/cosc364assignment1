@@ -123,9 +123,13 @@ class Daemon:
             packets.append(bytes(new_entry, "utf-8"))
 
         print("Made it past packet bytes step")
+        print("Packets is: {}".format(packets))
 
-        # for destination in dest_list:
-        #     input_sockets[0].sendto(packet, destination)
+        for destination in dest_list:
+            for packet in packets:
+                print("about to send packet")
+                input_sockets[0].sendto(packet, destination)
+                print("packet sent!!")
 
     # Infinite Loop
 
