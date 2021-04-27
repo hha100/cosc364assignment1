@@ -1,4 +1,4 @@
-import sys, socket, routingtable, configparser, select, protocol
+import sys, socket, routingtable, configparser, select, packet
 
 
 def init(input_ports):
@@ -66,18 +66,18 @@ def broadcast_table(rip_table, input_sockets):
 
     # Get list of neighbours/direct connections
     for sock in input_sockets:
-        
 
-    # ToDo: we want dest_list = list of ip addresses and their ports [(ip, port), (ip, port)]
-    dest_list = []
 
-    # Create packet with table to send
-    packet = bytes(rip_table, "utf-8")
+        # ToDo: we want dest_list = list of ip addresses and their ports [(ip, port), (ip, port)]
+        dest_list = []
 
-    # Send packet to each neighbour
-    for sockets in input_sockets:
-        for destination in dest_list:
-            sockets.sendto(packet, destination)
+        # Create packet with table to send
+        packet = bytes(rip_table, "utf-8")
+
+        # Send packet to each neighbour
+        for sockets in input_sockets:
+            for destination in dest_list:
+                sockets.sendto(packet, destination)
 
 
 # Infinite Loop
@@ -87,6 +87,9 @@ def start_loop(config_filename):
     config_filename, router_id, input_ports, output_ports, timeouts = configparser.parse(config_filename)
     rip_table = routingtable.init_table(config_filename, output_ports)
     input_sockets = init(input_ports)
+    print("output ports!!!")
+    for op in output_ports:
+        print("op: {}".format(op))
 
     try:
         while True:
