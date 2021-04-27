@@ -9,6 +9,29 @@ def connect_socket(input_port):
     return daemon
 
 
+def entry_to_string(rip_entry):
+    print("start of inside ets")
+    destination, costs, next_hop, flag, came_from = rip_entry.get_info()
+    string = "{0}_{1}_{2}_{3}_{4}".format(destination, costs, next_hop, flag, came_from)
+    print("entry_to_string is: {}".format(string))
+    return string
+
+
+def string_to_entry(string):
+
+    # Split the string into entry values and generate a new RIPEntry
+    entry = routingtable.RIPEntry()
+    values = string.split("_")
+    entry.destination = values[0]
+    entry.costs = values[1]
+    entry.next_hop = values[2]
+    entry.flag = values[3]
+    # ToDo: Change the came_from here? or should this be done somewhere else? let's see....
+    entry.came_from = values[4]
+    print("Finished parsing string to entry. RIPEntry is:\n{}".format(entry))
+    return entry
+
+
 class Daemon:
 
     def __init__(self):
@@ -94,7 +117,10 @@ class Daemon:
         packets = []
         for entry in table_entries:
             print(entry)
-            # packets.append(bytes(entry, "utf-8"))
+            print("just before entry_to_string")
+            new_entry = entry_to_string(entry)
+            print("just after entry_to_string")
+            packets.append(bytes(new_entry, "utf-8"))
 
         print("Made it past packet bytes step")
 
