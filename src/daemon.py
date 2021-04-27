@@ -31,6 +31,7 @@ class Daemon:
         self.output_ports = []
         self.open_sockets = []
         self.router_id = None
+        self.timeouts = None
 
     def init(self, input_ports):
         # Set up a UDP socket for each input ports (none needed for output ports)
@@ -144,7 +145,8 @@ class Daemon:
 
     def start_loop(self, config_filename):
         print("initializing... (start of loop function, before loop)")
-        config_filename, self.router_id, self.input_ports, self.output_ports, timeouts = configparser.parse(config_filename)
+        config_filename, self.router_id, self.input_ports, self.output_ports, self.timeouts = configparser.parse(config_filename)
+        print("timeouts: {}".format(self.timeouts))
         self.rip_table = routingtable.init_table(config_filename, self.output_ports)
         input_sockets = self.init(self.input_ports)
         self.open_sockets = input_sockets
@@ -197,7 +199,9 @@ class Daemon:
                     # for s in exceptional:
                     #    print("Select() exceptional error\nsocket: {}".format(socket))
                     print("sleeping...")
-                    time.sleep(10)
+                    # To set periodic timer (usually 30secs)
+                    # time.sleep(self.timeouts[1])
+                    time.sleep(7)
                     print("awake")
 
                 # Look into python's socket import receive and send functions
