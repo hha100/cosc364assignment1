@@ -8,7 +8,6 @@ class RIPEntry:
     -Flag to indicate that info about the route has changed recently. (AKA "route change flag")
     -Various timers associated with route (?)
     -Subnet mask if all extensions are implemented. We are not implementing any extensions, therefore subnet mask is not needed
-    -WIP: We need garbage collection
     """
 
     # Initialise variables
@@ -53,24 +52,20 @@ class RoutingTable:
         return self.entries
 
     def update_entry(self, current_entry, replacement_entry):
-        # ToDo: Add checks to make sure the data is valid. Maybe separate it out into a single validator function?
         destination, costs, next_hop, flag, came_from = replacement_entry.get_info()
         self.entries[current_entry].costs = costs
         self.entries[current_entry].came_from = came_from
         self.entries[current_entry].next_hop = next_hop
         self.entries[current_entry].flag = flag
-        print("Entry updated. Entry was: {0} \n Entry is now {1}".format(current_entry, self.entries[current_entry]))
 
     def remove_entry(self, destination):
         for entry in self.entries:
             if entry.destination == destination:
                 self.entries.remove(entry)
-                print("Removed entry {}".format(entry))
                 break
 
 
 # Now we want to create the initial Routing Table, using the output ports from the config file
-
 def init_table(config_filename, output_ports):
     rip_table = RoutingTable(config_filename)
     for index in range(len(output_ports)):

@@ -1,6 +1,5 @@
 import sys
 
-
 def parse(config_filename):
     print()  # To aid with readability of the text output in terminal
 

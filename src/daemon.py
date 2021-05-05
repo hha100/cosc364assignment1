@@ -1,6 +1,5 @@
 import sys, socket, routingtable, configparser, select, time
 
-
 def connect_socket(input_port):
     # Create TCP/IP socket and binds to the given port
     daemon = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -17,7 +16,6 @@ def string_to_entry(string):
     entry.costs = values[1]
     entry.next_hop = values[2]
     entry.flag = values[3]
-    # ToDo: Change the came_from here? or should this be done somewhere else? let's see....
     entry.came_from = values[4]
     print("Finished parsing string to entry. RIPEntry is:\n{}".format(entry))
     return entry
@@ -41,9 +39,6 @@ class Daemon:
             daemon = connect_socket(portnum)
             input_sockets.append(daemon)
 
-        # print("The socket info is:\n", [x.getsockname() for x in input_sockets])
-        # print([type(x) for x in input_sockets])
-
         for index in range(len(input_sockets)):
             network, portnum = input_sockets[index].getsockname()
             print("Socket created on network {} with port number {}.".format(network, portnum))
@@ -54,7 +49,6 @@ class Daemon:
         destination, costs, next_hop, flag, came_from = rip_entry.get_info()
         came_from = self.router_id
         string = "{0}_{1}_{2}_{3}_{4}".format(destination, costs, next_hop, flag, came_from)
-        # print("entry_to_string created! value: {}".format(string))
         return string
 
     def compare_tables(self, incoming_table):
@@ -72,12 +66,8 @@ class Daemon:
                 for rip_table_entry in self.rip_table.get_table():
                     rip_destination, rip_costs, rip_next_hop, rip_flag, rip_came_from = rip_table_entry.get_info()
                     if inc_destination == rip_destination():
-                        cost_to_connection = 1  # Assume the metric/cost to a connected router or network is 1
-                        # Maybe an if to check if incoming is to the directly connected network? And pass it on? or would that logic be somewhere else like in main
+                        cost_to_connection = 1
                         total_incoming_cost = inc_costs + cost_to_connection
-                        # ToDo: When sending out a table, add your own came_from to all entries (set your own router ID to it)
-                        # ToDo: Make sure data is valid
-                        # Here is the actual comparison code
                         if (total_incoming_cost < rip_costs) or ((inc_came_from == rip_came_from) and (
                                 (total_incoming_cost != rip_costs) or (inc_flag != rip_flag) or (
                                 inc_next_hop != rip_next_hop))):
@@ -87,12 +77,7 @@ class Daemon:
         print("Routing Table comparison complete.")
         return self.rip_table
 
-        # print("{0} \n {1} \n {2} \n {3} \n {4}".format(destination, costs, next_hop, flag, came_from))  # For debugging
-
     def broadcast_table(self, input_sockets=[]):
-        # print("Attempting to send my table to all neighbours...")
-        # print("...But there's no sending logic yet")
-        # print("Sending my routing table to all neighbours...")
 
         ip = 'localhost'
         dest_list = []
@@ -100,140 +85,58 @@ class Daemon:
         # Get list of neighbours/direct connections
         # Create list of neighbours
         for output_port in self.output_ports:
-            # print("----OUTPORT PORT BEING ADDED TO DEST_LIST: {}".format(output_port[0]))
             dest = (ip, output_port[0])
             dest_list.append(dest)
-
-        # ToDo: we want dest_list = list of ip addresses and their ports [(ip, port), (ip, port)]
-        # print("Made it past 1st for loop, dest_list created")
-        # print("dest_list is: {}".format(dest_list))
-
-        # Create packet with table to send
-        # Turn RIP table into data to send
-        # table_data = ''
-        # table_data = packet.table_to_packet(self.rip_table)
         table_entries = self.rip_table.entries
-        # print("ENTRIES in self.rip_table.entries:\n")
         packets = []
         sending_socket = self.open_sockets[0]
         for entry in table_entries:
-            # print(entry)
             new_entry = self.entry_to_string(entry)
-            
             new_encoded_entry = new_entry.encode()
-
             packets.append(new_encoded_entry)
-
-        # print("\nMade it past entries to data loop of broadcast_table\n")
-        # print("Packets is: {}".format(packets))
+            
         for destination in dest_list:
-            # print("Destination to send packet to: {}\nConnecting to router...".format(destination))
-            # sending_socket.connect(destination)
-            # print("Connected to router {}".format(destination))
             for pack in packets:
-                # print("Top of for pack in packets loop (broadcast)\nSending packet...")
-                # print("self.open_sockets are: {}\nsending_socket is: {}".format(self.open_sockets, sending_socket))
-                # Connect to the router
-
-                # And then send
-                # print("Sending...")
                 sending_socket.sendto(pack, destination)
-                # print("packet sent!!")
 
     # Infinite Loop
-
     def start_loop(self, config_filename):
-        print("initializing... (start of loop function, before loop)")
         config_filename, self.router_id, self.input_ports, self.output_ports, self.timeouts = configparser.parse(config_filename)
-        print("timeouts: {}".format(self.timeouts))
+        
         self.rip_table = routingtable.init_table(config_filename, self.output_ports)
         input_sockets = self.init(self.input_ports)
         self.open_sockets = input_sockets
-        print("output ports!!!")
-        for op in self.output_ports:
-            print("op: {}".format(op))
 
         try:
             while True:
-                # use select() to block until events occur
-                print("while loop")
-                # Check our neighbour routers and make sure we can still access them all
-                # Send out the current table
-                
                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 for entry in self.rip_table.entries:
                     print(entry)
                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 
-                # If a table is received from another router....
-                # rip_table = compare_tables(rip_table, incoming_table)
-                # break
-    
                 # If self.open_sockets is not empty, run the select() function to listen to all sockets at the same time
                 if self.open_sockets:
-                    #print("self.open_sockets is:\n{}".format(self.open_sockets))
-                    # ToDo: Timer
-                    print("\nBroadcasting table....")
                     self.broadcast_table()
-                    print("Finished broadcasting table.\n")
-                    # ToDo: remove the number 2 and have a variable in its place (it represents timeout of select function)
-                    readable, writable, exceptional = select.select(self.open_sockets, [], self.open_sockets, 2)
-                    #print("Select statement done.\nreadable: {0}\nwritable: {1}\nexceptional: {2}".format(readable,  writable, exceptional))
+                    readable, writable, exceptional = select.select(self.open_sockets, [], self.open_sockets, 180)
                     rec_socket = self.open_sockets[0]
                     rec_port = rec_socket.getsockname()[1]
-                    #print("Rec port: {}".format(rec_port))
                     data, addr = False, ""
                     for s in readable:
-                        print("Start of for s in readable loop")
                         if s:
-                            print("we are s: {}".format(s))
                             try:
                                 data, addr = s.recvfrom(128)
-                            except socket.error:
-                                print("socket.error")
-                                pass
-                            except socket.herror:
-                                print("socket.herror")
-                                pass
-                            except socket.gaierror:
-                                print("socket.gaierror")
-                                pass
-                            except socket.timeout:
-                                print("socket.timeout")
-                                pass
                             except:
-                                print("other socket error with recvfrom")
-                        else:
-                            print("was not s")
+                                pass
                     
                     if data:
-                        print("for s in readable:\nData: {}\nAddr: {}".format(data, addr))
-                        print("Decoded data: {}".format(data.decode('utf-8')))
-                        # Create and send response
-    
-                    # Triggered update code here (?)
-    
-                    # connection, client_address = s.accept()
-    
-                    # response = into_packet(
-                    # if response is not None:
-                    #     s.sendto(byte_message, (client_ip_address, port_number))
-                    # s.sendto(encoded_message, target_destination)
-    
-                    for s in exceptional:
-                        print("Select() exceptional error. Exceptional: {}\ns: {}".format(exceptional, s))
-    
-                    print("sleeping...")
-                    # To set periodic timer (usually 30secs)
-                    # time.sleep(self.timeouts[1])
-                    time.sleep(7)
-                    print("awake")
-    
-                    # Look into python's socket import receive and send functions
+                        data = data.decode('utf-8').split('_')
+                        print("Received Routing Entry From Router {}:\nData: {}\nAddr: {}".format(data[-1], data, addr))
+                    
+                    print('...')
+                    time.sleep(5)
+                    
         except KeyboardInterrupt:
             print("User aborted program with Ctrl C")
             pass
         except:
             print("An error occurred (exception in daemon start_loop)")
-            pass
-            # sys.exit()
